@@ -62,6 +62,7 @@ function playGame(models) {
 
     const grass = new Entity("grass", models, 0, -0.4, 0);
     scene.add(grass.model);
+    
     const tree0 = new Entity("tree0", models, 2, 0, 0);
     scene.add(tree0.model);
     const tree1 = new Entity("tree1", models, 4, 0, 0);
