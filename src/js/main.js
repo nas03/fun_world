@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
 import { loadAllModels } from './loadModelFromDish.js';
 import { Entity } from './entities/entity.js';
-
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotateY(Math.PI);
@@ -21,10 +20,9 @@ const gridHelper = new THREE.GridHelper(10, 10);
 gridHelper.position.set(0, 0, 0);
 scene.add(gridHelper);
 
+// tạo ra nguồn sáng ( giống mặt trời) trong phòng
 const ambientLight = new THREE.AmbientLight(0xffffff, 2); // White light, intensity 2
 scene.add(ambientLight);
-
-
 
 const modelPaths = [
     { path: '../assets/chicken.glb', type: "chicken" },
@@ -86,14 +84,13 @@ function playGame(models) {
     cars.push(orange_car1);
     scene.add(orange_car1.model);
 
-
     // Get player position after it's initialized
     const playerPosition = player.getPosition();
 
     // Event listener for keydown
     document.addEventListener('keydown', function (event) {
         var keyCode = event.keyCode;
-        var movementDistance = 0.1;
+        var movementDistance = 0.2;
         var deltaX = 0, deltaY = 0, deltaZ = 0;
         switch (keyCode) {
             case 37:
@@ -112,10 +109,19 @@ function playGame(models) {
 
         // Update player position
         playerPosition.x += deltaX;
+        playerPosition.x = Math.max(-10, Math.min(10, playerPosition.x));
         playerPosition.z += deltaZ;
+        playerPosition.z = Math.max(-10, Math.min(10, playerPosition.z));
 
-        // Set new player position
         player.setPosition(playerPosition.x, playerPosition.y, playerPosition.z);
+
+        const cameraOffset = new THREE.Vector3(deltaX, 0, deltaZ);
+        camera.position.add(cameraOffset);
+
+        camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
+        camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
+
+        camera.lookAt(player.model.position);
     });
 
 }

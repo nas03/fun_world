@@ -14,7 +14,7 @@ async function loadModel(modelPath) {
             (gltf) => {
                 // Model đã được load thành công
                 resolve(gltf.scene);
-            },
+            }, 
             undefined, // Không cần callback progress ở đây
             (error) => {
                 // Xảy ra lỗi khi load model
