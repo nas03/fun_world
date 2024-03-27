@@ -4,10 +4,14 @@ import { loadAllModels } from './loadModelFromDish.js';
 import { Entity } from './entities/entity.js';
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.rotateY(Math.PI);
-camera.updateMatrixWorld();
-const renderer = new THREE.WebGLRenderer();
+camera.position.set(4.61, 2.74, 8);
+
+const renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true
+});
 renderer.setClearColor(0xcccccc);
+renderer.shadowMap.enabled = true
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -68,11 +72,10 @@ function playGame(models) {
     scene.add(tree2.model);
     const tree3 = new Entity("tree3", models, -4, 0, 0);
     scene.add(tree3.model);
-    const blank_road = new Entity("blank_road", models, 0, 0, 1);
+    const blank_road = new Entity("blank_road", models, 0, -0.4, 1);
     scene.add(blank_road.model);
-    const stripe_road = new Entity("stripe_road", models, 0, 0, 2);
+    const stripe_road = new Entity("stripe_road", models, 0, -0.4, 2);
     scene.add(stripe_road.model);
-
 
     const orange_car = new Entity("orange_car", models, -10, 0.2, 2);
     orange_car.model.rotateY(Math.PI / 2);
