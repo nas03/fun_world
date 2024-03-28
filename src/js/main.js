@@ -51,6 +51,17 @@ loadAllModels(modelPaths)
 
 var player;
 var cars = [];
+
+// Định nghĩa thông số cho chuyển động nhảy
+const jumpHeight = 1.5; // Độ cao của nhảy
+const jumpDuration = 500; // Thời gian của mỗi nhảy (milliseconds)
+const jumpCount = 2; // Số lần nhảy
+
+let isJumping = false;
+let jumpStartTime;
+let jumpStartPosY;
+
+
 function playGame(models) {
     if (models === null || models === undefined)
         console.error("models null at main");
@@ -93,20 +104,47 @@ function playGame(models) {
     // Event listener for keydown
     document.addEventListener('keydown', function (event) {
         var keyCode = event.keyCode;
-        var movementDistance = 0.1;
+        var movementDistance = 0.5;
         var deltaX = 0, deltaY = 0, deltaZ = 0;
         switch (keyCode) {
             case 37:
                 deltaX = +movementDistance; // sang trai
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpStartTime = Date.now();
+                    jumpStartPosY = player.model.position.y;
+                    jump();
+                }
+
                 break;
             case 38:
                 deltaZ = +movementDistance; // sang phai
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpStartTime = Date.now();
+                    jumpStartPosY = player.model.position.y;
+                    jump();
+                }
                 break;
             case 39:
                 deltaX = -movementDistance; //xuong
+
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpStartTime = Date.now();
+                    jumpStartPosY = player.model.position.y;
+                    jump();
+                }
                 break;
             case 40:
                 deltaZ = -movementDistance; // len
+
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpStartTime = Date.now();
+                    jumpStartPosY = player.model.position.y;
+                    jump();
+                }
                 break;
         }
 
@@ -134,5 +172,22 @@ function animate() {
         car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); // Fix the setting of position
     });
     renderer.render(scene, camera);
+}
+
+function jump() {
+    const elapsedTime = Date.now() - jumpStartTime;
+    const jumpProgress = Math.min(elapsedTime / jumpDuration, 1); // Ensure jump completes within duration
+
+    const jumpPosY = jumpStartPosY + jumpHeight * Math.sin(Math.PI * jumpProgress);
+
+    player.model.position.y = jumpPosY;
+
+    if (elapsedTime < jumpDuration) {
+        requestAnimationFrame(jump);
+    } else {
+        isJumping = false;
+        // Reset player position to ground level
+        player.model.position.y = jumpStartPosY;
+    }
 }
 animate(cars);
