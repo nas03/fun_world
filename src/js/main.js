@@ -2,13 +2,16 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
 import { loadAllModels } from './loadModelFromDish.js';
 import { Entity } from './entities/entity.js';
-
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.rotateY(Math.PI);
-camera.updateMatrixWorld();
-const renderer = new THREE.WebGLRenderer();
+camera.position.set(4.61, 2.74, 8);
+
+const renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true
+});
 renderer.setClearColor(0xcccccc);
+renderer.shadowMap.enabled = true
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -21,10 +24,9 @@ const gridHelper = new THREE.GridHelper(10, 10);
 gridHelper.position.set(0, 0, 0);
 scene.add(gridHelper);
 
+// tạo ra nguồn sáng ( giống mặt trời) trong phòng
 const ambientLight = new THREE.AmbientLight(0xffffff, 2); // White light, intensity 2
 scene.add(ambientLight);
-
-
 
 const modelPaths = [
     { path: '../assets/chicken.glb', type: "chicken" },
@@ -70,11 +72,10 @@ function playGame(models) {
     scene.add(tree2.model);
     const tree3 = new Entity("tree3", models, -4, 0, 0);
     scene.add(tree3.model);
-    const blank_road = new Entity("blank_road", models, 0, 0, 1);
+    const blank_road = new Entity("blank_road", models, 0, -0.4, 1);
     scene.add(blank_road.model);
-    const stripe_road = new Entity("stripe_road", models, 0, 0, 2);
+    const stripe_road = new Entity("stripe_road", models, 0, -0.4, 2);
     scene.add(stripe_road.model);
-
 
     const orange_car = new Entity("orange_car", models, -10, 0.2, 2);
     orange_car.model.rotateY(Math.PI / 2);
@@ -86,14 +87,13 @@ function playGame(models) {
     cars.push(orange_car1);
     scene.add(orange_car1.model);
 
-
     // Get player position after it's initialized
     const playerPosition = player.getPosition();
 
     // Event listener for keydown
     document.addEventListener('keydown', function (event) {
         var keyCode = event.keyCode;
-        var movementDistance = 0.1;
+        var movementDistance = 0.2;
         var deltaX = 0, deltaY = 0, deltaZ = 0;
         switch (keyCode) {
             case 37:
@@ -112,10 +112,19 @@ function playGame(models) {
 
         // Update player position
         playerPosition.x += deltaX;
+        playerPosition.x = Math.max(-10, Math.min(10, playerPosition.x));
         playerPosition.z += deltaZ;
+        playerPosition.z = Math.max(-10, Math.min(10, playerPosition.z));
 
-        // Set new player position
         player.setPosition(playerPosition.x, playerPosition.y, playerPosition.z);
+
+        const cameraOffset = new THREE.Vector3(deltaX, 0, deltaZ);
+        camera.position.add(cameraOffset);
+
+        camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
+        camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
+
+        camera.lookAt(player.model.position);
     });
 
 }
@@ -124,9 +133,44 @@ camera.position.z = -5;
 camera.position.y = 5;
 orbit.update(); // Move orbit controls update here
 
+const collisionThreshold = 1; // Defined ngưỡng va chạm
+
+function checkCollisions() {
+    for (let i = 0; i < cars.length; i++) {
+        const car = cars[i];
+        const carPosition = car.model.position;
+        const distance = player.model.position.distanceTo(carPosition);
+        // Nếu khoảng cách nhỏ hơn ngưỡng va chạm, xem như có va chạm
+        if (distance < collisionThreshold) {
+            endGame();
+            return;
+        }
+    }
+
+    /*const trees = [tree0, tree1, tree2, tree3];
+    for (let i = 0; i < trees.length; i++) {
+        const tree = trees[i];
+        const treePosition = tree.model.position;
+        const distanceToTree = player.model.position.distanceTo(treePosition);
+        // Nếu khoảng cách nhỏ hơn ngưỡng va chạm với cây, xem như có va chạm
+        if (distanceToTree < collisionThreshold) {
+            // Lưu lại vị trí hợp lệ trước đó của người chơi
+            player.lastValidPosition.copy(player.model.position);
+            // Thiết lập lại vị trí của người chơi để ngăn chúng đi qua cây
+            player.setPosition(player.lastValidPosition.x, player.lastValidPosition.y, player.lastValidPosition.z);
+            return;
+        }
+    }*/
+}
+
+function endGame() {
+    console.log("Game Over");
+    player.setPosition(0, 0, 0);
+}
+
 function animate() {
     requestAnimationFrame(animate);
-
+    checkCollisions();
     console.error(cars.length);
     const carArray = Object.values(cars);
     carArray.forEach(car => {
