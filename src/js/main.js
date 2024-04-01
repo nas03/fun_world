@@ -12,6 +12,14 @@ let previousTimestamp;
 let startMoving;
 let moves;
 let stepStartTimestamp;
+
+const jumpHeight = 1; // Độ cao của nhảy
+const jumpDuration = 400; // Thời gian của mỗi nhảy (milliseconds)
+
+let isJumping = false;
+let jumpStartTime;
+let jumpStartPosY;
+
 // camera trong game
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -98,20 +106,45 @@ function playGame(models) {
     // Event listener for keydown
     document.addEventListener('keydown', function (event) {
         var keyCode = event.keyCode;
-        var movementDistance = 0.2;
+        var movementDistance = 1;
         var deltaX = 0, deltaY = 0, deltaZ = 0;
         switch (keyCode) {
             case 37:
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpStartTime = Date.now();
+                    jumpStartPosY = player.model.position.y;
+                    jump();
+                }
                 deltaX = +movementDistance; // sang trai
+                
                 break;
             case 38:
                 deltaZ = +movementDistance; // sang phai
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpStartTime = Date.now();
+                    jumpStartPosY = player.model.position.y;
+                    jump();
+                }
                 break;
             case 39:
                 deltaX = -movementDistance; //xuong
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpStartTime = Date.now();
+                    jumpStartPosY = player.model.position.y;
+                    jump();
+                }
                 break;
             case 40:
                 deltaZ = -movementDistance; // len
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpStartTime = Date.now();
+                    jumpStartPosY = player.model.position.y;
+                    jump();
+                }
                 break;
         }
 
@@ -145,4 +178,22 @@ function animate() {
     });
     renderer.render(scene, camera);
 }
+
+function jump() {
+    const elapsedTime = Date.now() - jumpStartTime;
+    const jumpProgress = Math.min(elapsedTime / jumpDuration, 1); // Ensure jump completes within duration
+
+    const jumpPosY = jumpStartPosY + jumpHeight * Math.sin(Math.PI * jumpProgress);
+
+    player.model.position.y = jumpPosY;
+
+    if (elapsedTime < jumpDuration) {
+        requestAnimationFrame(jump);
+    } else {
+        isJumping = false;
+        // Reset player position to ground level
+        player.model.position.y = jumpStartPosY;
+    }
+}
+
 animate(cars);
