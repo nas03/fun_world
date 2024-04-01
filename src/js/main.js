@@ -2,9 +2,20 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
 import { loadAllModels } from './loadModelFromDish.js';
 import { Entity } from './entities/entity.js';
+
+const counterDOM = document.getElementById('counter');  
+let lanes;
+let currentLane;
+let currentColumn;
+
+let previousTimestamp;
+let startMoving;
+let moves;
+let stepStartTimestamp;
+// camera trong game
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(4.61, 2.74, 8);
+camera.position.set(-4.61, 5, -5);
 
 const renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -20,12 +31,7 @@ const orbit = new OrbitControls(camera, renderer.domElement);
 const axesHelper = new THREE.AxesHelper();
 scene.add(axesHelper);
 
-const gridHelper = new THREE.GridHelper(10, 10);
-gridHelper.position.set(0, 0, 0);
-scene.add(gridHelper);
-
-// tạo ra nguồn sáng ( giống mặt trời) trong phòng
-const ambientLight = new THREE.AmbientLight(0xffffff, 2); // White light, intensity 2
+const ambientLight = new THREE.AmbientLight(0xffffff, 3);
 scene.add(ambientLight);
 
 const modelPaths = [
@@ -129,9 +135,7 @@ function playGame(models) {
 
 }
 
-camera.position.z = -5;
-camera.position.y = 5;
-orbit.update(); // Move orbit controls update here
+orbit.update();
 
 function animate() {
     requestAnimationFrame(animate);
