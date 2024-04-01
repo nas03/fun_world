@@ -6,15 +6,19 @@ class Entity {
         this.model = null; // Initialize model as null
         if (models === null || models === undefined)
             console.error("models null");
+        let exist = false;
         models.forEach(m => {
             if (m.type === type && m.model) {
                 this.model = m.model.clone();
-            } else {
-                console.error("model not und");
+                exist = true;
             }
         });
         // Check if model is not null before setting position
-        this.setPosition(x, y, z);
+        if (exist) {
+            this.setPosition(x, y, z);
+        } else {
+            console.error(`${type} model not found`)
+        }
     }
 
     setPosition(x, y, z) {

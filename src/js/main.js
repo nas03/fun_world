@@ -60,10 +60,9 @@ loadAllModels(modelPaths)
 var player;
 var cars = [];
 function playGame(models) {
-    if (models === null || models === undefined)
+    if (models === null || models === undefined) {
         console.error("models null at main");
-    else
-        console.error("models not null at main");
+    }
 
     player = new Entity("chicken", models, 0, 0, 0);
     scene.add(player.model);
@@ -139,8 +138,6 @@ orbit.update();
 
 function animate() {
     requestAnimationFrame(animate);
-
-    console.error(cars.length);
     const carArray = Object.values(cars);
     carArray.forEach(car => {
         const carPos = car.model.position; // Fix the access to position property
