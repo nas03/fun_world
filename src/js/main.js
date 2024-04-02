@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
 import { loadAllModels } from './loadModelFromDish.js';
 import { Entity } from './entities/entity.js';
+import { Player } from './entities/player.js';
 
 const counterDOM = document.getElementById('counter');  
 let lanes;
@@ -12,13 +13,6 @@ let previousTimestamp;
 let startMoving;
 let moves;
 let stepStartTimestamp;
-
-const jumpHeight = 1; // Độ cao của nhảy
-const jumpDuration = 400; // Thời gian của mỗi nhảy (milliseconds)
-
-let isJumping = false;
-let jumpStartTime;
-let jumpStartPosY;
 
 // camera trong game
 const scene = new THREE.Scene();
@@ -65,14 +59,13 @@ loadAllModels(modelPaths)
         console.error('Lỗi khi load model:', error);
     });
 
-var player;
-var cars = [];
+const cars = [];
 function playGame(models) {
     if (models === null || models === undefined) {
         console.error("models null at main");
     }
 
-    player = new Entity("chicken", models, 0, 0, 0);
+    const player = new Player("chicken", models, 0, 0, 0);
     scene.add(player.model);
 
     const grass = new Entity("grass", models, 0, -0.4, 0);
@@ -100,69 +93,16 @@ function playGame(models) {
     cars.push(orange_car1);
     scene.add(orange_car1.model);
 
-    // Get player position after it's initialized
-    const playerPosition = player.getPosition();
-
     // Event listener for keydown
     document.addEventListener('keydown', function (event) {
-        var keyCode = event.code;
-        var movementDistance = 1;
-        var deltaX = 0, deltaZ = 0;
-        switch (keyCode) {
-            case "ArrowLeft":
-                if (!isJumping) {
-                    isJumping = true;
-                    jumpStartTime = Date.now();
-                    jumpStartPosY = player.model.position.y;
-                    jump();
-                }
-                deltaX = +movementDistance; // sang trai
-                break;
-            case "ArrowRight":
-                deltaX = -movementDistance; //phai
-                if (!isJumping) {
-                    isJumping = true;
-                    jumpStartTime = Date.now();
-                    jumpStartPosY = player.model.position.y;
-                    jump();
-                }
-                break;
-            case "ArrowDown":
-                deltaZ = -movementDistance; // xuong
-                if (!isJumping) {
-                    isJumping = true;
-                    jumpStartTime = Date.now();
-                    jumpStartPosY = player.model.position.y;
-                    jump();
-                }
-                break;
-            case "ArrowUp":
-                deltaZ = +movementDistance; // len
-                if (!isJumping) {
-                    isJumping = true;
-                    jumpStartTime = Date.now();
-                    jumpStartPosY = player.model.position.y;
-                    jump();
-                }
-                break;
-        }
-
-        // Update player position
-        playerPosition.x += deltaX;
-        playerPosition.x = Math.max(-10, Math.min(10, playerPosition.x));
-        playerPosition.z += deltaZ;
-        playerPosition.z = Math.max(-10, Math.min(10, playerPosition.z));
-
-        player.setPosition(playerPosition.x, playerPosition.y, playerPosition.z);
-
-        const cameraOffset = new THREE.Vector3(deltaX, 0, deltaZ);
-        camera.position.add(cameraOffset);
+        player.move(event);
+        camera.position.add(player.cameraOffset);
 
         camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
         camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
 
         camera.lookAt(player.model.position);
-    });
+    })
 
 }
 
@@ -178,21 +118,6 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-function jump() {
-    const elapsedTime = Date.now() - jumpStartTime;
-    const jumpProgress = Math.min(elapsedTime / jumpDuration, 1); // Ensure jump completes within duration
 
-    const jumpPosY = jumpStartPosY + jumpHeight * Math.sin(Math.PI * jumpProgress);
-
-    player.model.position.y = jumpPosY;
-
-    if (elapsedTime < jumpDuration) {
-        requestAnimationFrame(jump);
-    } else {
-        isJumping = false;
-        // Reset player position to ground level
-        player.model.position.y = jumpStartPosY;
-    }
-}
 
 animate(cars);
