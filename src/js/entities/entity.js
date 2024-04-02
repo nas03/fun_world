@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 class Entity {
     constructor(type, models, x, y, z) {
         this.type = type;

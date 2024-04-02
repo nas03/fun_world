@@ -1,7 +1,6 @@
 // loadModel.js
 
 // Import các module cần thiết
-import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // Hàm để load model

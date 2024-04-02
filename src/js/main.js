@@ -107,7 +107,7 @@ function playGame(models) {
     document.addEventListener('keydown', function (event) {
         var keyCode = event.code;
         var movementDistance = 1;
-        var deltaX = 0, deltaY = 0, deltaZ = 0;
+        var deltaX = 0, deltaZ = 0;
         switch (keyCode) {
             case "ArrowLeft":
                 if (!isJumping) {
