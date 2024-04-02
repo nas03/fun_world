@@ -105,11 +105,11 @@ function playGame(models) {
 
     // Event listener for keydown
     document.addEventListener('keydown', function (event) {
-        var keyCode = event.keyCode;
+        var keyCode = event.code;
         var movementDistance = 1;
         var deltaX = 0, deltaY = 0, deltaZ = 0;
         switch (keyCode) {
-            case 37:
+            case "ArrowLeft":
                 if (!isJumping) {
                     isJumping = true;
                     jumpStartTime = Date.now();
@@ -117,10 +117,9 @@ function playGame(models) {
                     jump();
                 }
                 deltaX = +movementDistance; // sang trai
-                
                 break;
-            case 38:
-                deltaZ = +movementDistance; // sang phai
+            case "ArrowRight":
+                deltaX = -movementDistance; //phai
                 if (!isJumping) {
                     isJumping = true;
                     jumpStartTime = Date.now();
@@ -128,8 +127,8 @@ function playGame(models) {
                     jump();
                 }
                 break;
-            case 39:
-                deltaX = -movementDistance; //xuong
+            case "ArrowDown":
+                deltaZ = -movementDistance; // xuong
                 if (!isJumping) {
                     isJumping = true;
                     jumpStartTime = Date.now();
@@ -137,8 +136,8 @@ function playGame(models) {
                     jump();
                 }
                 break;
-            case 40:
-                deltaZ = -movementDistance; // len
+            case "ArrowUp":
+                deltaZ = +movementDistance; // len
                 if (!isJumping) {
                     isJumping = true;
                     jumpStartTime = Date.now();
