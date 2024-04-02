@@ -1,6 +1,7 @@
 // loadModel.js
 
 // Import các module cần thiết
+import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // Hàm để load model
@@ -13,7 +14,7 @@ async function loadModel(modelPath) {
             (gltf) => {
                 // Model đã được load thành công
                 resolve(gltf.scene);
-            }, 
+            },
             undefined, // Không cần callback progress ở đây
             (error) => {
                 // Xảy ra lỗi khi load model

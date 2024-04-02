@@ -4,7 +4,7 @@ import { loadAllModels } from './loadModelFromDish.js';
 import { Entity } from './entities/entity.js';
 import { Player } from './entities/player.js';
 
-const counterDOM = document.getElementById('counter');  
+const counterDOM = document.getElementById('counter');
 let lanes;
 let currentLane;
 let currentColumn;
@@ -60,12 +60,13 @@ loadAllModels(modelPaths)
     });
 
 const cars = [];
+var player;
 function playGame(models) {
     if (models === null || models === undefined) {
         console.error("models null at main");
     }
 
-    const player = new Player("chicken", models, 0, 0, 0);
+    player = new Player("chicken", models, 0, 0, 0);
     scene.add(player.model);
 
     const grass = new Entity("grass", models, 0, -0.4, 0);
@@ -93,23 +94,82 @@ function playGame(models) {
     cars.push(orange_car1);
     scene.add(orange_car1.model);
 
+
+    // Get player position after it's initialized
+    const playerPosition = player.getPosition();
+
     // Event listener for keydown
     document.addEventListener('keydown', function (event) {
-        player.move(event);
-        camera.position.add(player.cameraOffset);
+        var keyCode = event.keyCode;
+        var movementDistance = 0.1;
+        var deltaX = 0, deltaY = 0, deltaZ = 0;
+        switch (keyCode) {
+            case 37:
+                deltaX = +movementDistance; // sang trai
+                break;
+            case 38:
+                deltaZ = +movementDistance; // sang phai
+                break;
+            case 39:
+                deltaX = -movementDistance; //xuong
+                break;
+            case 40:
+                deltaZ = -movementDistance; // len
+                break;
+        }
 
-        camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
-        camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
+        // Update player position
+        playerPosition.x += deltaX;
+        playerPosition.z += deltaZ;
 
-        camera.lookAt(player.model.position);
-    })
+        // Set new player position
+        player.setPosition(playerPosition.x, playerPosition.y, playerPosition.z);
+    });
 
 }
 
-orbit.update();
+camera.position.z = -5;
+camera.position.y = 5;
+orbit.update(); // Move orbit controls update here
+
+const collisionThreshold = 1; // Defined ngưỡng va chạm
+
+function checkCollisions() {
+    for (let i = 0; i < cars.length; i++) {
+        const car = cars[i];
+        const carPosition = car.model.position;
+        const distance = player.model.position.distanceTo(carPosition);
+        // Nếu khoảng cách nhỏ hơn ngưỡng va chạm, xem như có va chạm
+        if (distance < collisionThreshold) {
+            endGame();
+            return;
+        }
+    }
+
+    /*const trees = [tree0, tree1, tree2, tree3];
+    for (let i = 0; i < trees.length; i++) {
+        const tree = trees[i];
+        const treePosition = tree.model.position;
+        const distanceToTree = player.model.position.distanceTo(treePosition);
+        // Nếu khoảng cách nhỏ hơn ngưỡng va chạm với cây, xem như có va chạm
+        if (distanceToTree < collisionThreshold) {
+            // Lưu lại vị trí hợp lệ trước đó của người chơi
+            player.lastValidPosition.copy(player.model.position);
+            // Thiết lập lại vị trí của người chơi để ngăn chúng đi qua cây
+            player.setPosition(player.lastValidPosition.x, player.lastValidPosition.y, player.lastValidPosition.z);
+            return;
+        }
+    }*/
+}
+
+function endGame() {
+    console.log("Game Over");
+    player.setPosition(0, 0, 0);
+}
 
 function animate() {
     requestAnimationFrame(animate);
+    checkCollisions();
     const carArray = Object.values(cars);
     carArray.forEach(car => {
         const carPos = car.model.position; // Fix the access to position property
@@ -117,7 +177,5 @@ function animate() {
     });
     renderer.render(scene, camera);
 }
-
-
 
 animate(cars);

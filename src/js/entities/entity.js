@@ -1,22 +1,20 @@
+import * as THREE from 'three';
+
 class Entity {
     constructor(type, models, x, y, z) {
         this.type = type;
         this.model = null; // Initialize model as null
         if (models === null || models === undefined)
             console.error("models null");
-        let exist = false;
         models.forEach(m => {
             if (m.type === type && m.model) {
                 this.model = m.model.clone();
-                exist = true;
+            } else {
+                console.error("model not und");
             }
         });
         // Check if model is not null before setting position
-        if (exist) {
-            this.setPosition(x, y, z);
-        } else {
-            console.error(`${type} model not found`)
-        }
+        this.setPosition(x, y, z);
     }
 
     setPosition(x, y, z) {
