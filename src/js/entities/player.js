@@ -1,7 +1,7 @@
 import { Entity } from "./entity";
 import { Vector3 } from "three";
 
-class Player extends Entity {
+export class Player extends Entity {
     cameraOffset;
     #isJumping = false;
 
@@ -13,21 +13,26 @@ class Player extends Entity {
         let keyCode = event.code;
         const movementDistance = 1;
         let deltaX = 0, deltaZ = 0;
+
         switch (keyCode) {
             case "ArrowLeft":
                 deltaX = +movementDistance; // sang trai
+                this.model.lookAt(this.posX + 1, 0, this.posZ)
                 this.jump();
                 break;
             case "ArrowRight":
                 deltaX = -movementDistance; //phai
+                this.model.lookAt(this.posX - 1, 0, this.posZ)
                 this.jump();
                 break;
             case "ArrowDown":
                 deltaZ = -movementDistance; // xuong
+                this.model.lookAt(this.posX, 0, this.posZ - 1)
                 this.jump();
                 break;
             case "ArrowUp":
                 deltaZ = +movementDistance; // len
+                this.model.lookAt(this.posX, 0, this.posZ + 1)
                 this.jump();
                 break;
         }
@@ -72,5 +77,3 @@ class Player extends Entity {
         }
     }
 }
-
-export { Player }
