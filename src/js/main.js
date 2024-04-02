@@ -94,14 +94,16 @@ function playGame(models) {
     scene.add(orange_car1.model);
 
     // Event listener for keydown
-    document.addEventListener('keydown', function (event) {
-        player.move(event);
-        camera.position.add(player.cameraOffset);
+    document.addEventListener('keydown', (event) => {
+        if (!event.repeat) {
+            player.move(event);
+            camera.position.add(player.cameraOffset);
 
-        camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
-        camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
+            camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
+            camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
 
-        camera.lookAt(player.model.position);
+            camera.lookAt(player.model.position);
+        }
     })
 
 }
