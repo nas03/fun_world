@@ -3,7 +3,7 @@ import { Vector3 } from "three";
 
 class Player extends Entity {
     cameraOffset;
-    #isJumping = false;
+    isJumping = false;
 
     constructor(type, models, x, y, z) {
         super(type, models, x, y, z);

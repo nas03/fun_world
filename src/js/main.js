@@ -16,7 +16,7 @@ let stepStartTimestamp;
 
 // camera trong game
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(-4.61, 5, -5);
 
 const renderer = new THREE.WebGLRenderer({
@@ -48,7 +48,6 @@ const modelPaths = [
     { path: '../assets/orange_car.glb', type: "orange_car" }
 ];
 
-// Load tất cả các model
 loadAllModels(modelPaths)
     .then((models) => {
         console.log('Các model đã được load:', models);
@@ -61,6 +60,69 @@ loadAllModels(modelPaths)
 
 const cars = [];
 var player;
+let roadLength = 20;
+let laneWidth = 2;
+function generateRandomPosition(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function createLane(laneType, zPosition, models) {
+    const lane = {
+        type: laneType,
+        entities: [],
+    };
+    // Place grass on either side of the lane
+    const grassLeft = new Entity("grass", models, -laneWidth / 2, -0.4, zPosition);
+    scene.add(grassLeft.model);
+    lane.entities.push(grassLeft);
+
+    const grassRight = new Entity("grass", models, laneWidth / 2, -0.4, zPosition);
+    scene.add(grassRight.model);
+    lane.entities.push(grassRight);
+
+    // Place road in the center
+    const roadSegment = new Entity(laneType === 'field' ? "blank_road" : "stripe_road", models, 0, -0.4, zPosition);
+    scene.add(roadSegment.model);
+    lane.entities.push(roadSegment);
+
+    // Place trees randomly on the sides (optional)
+    /*
+    const numTrees = generateRandomPosition(1, 3); // Adjust number of trees per lane
+    for (let i = 0; i < numTrees; i++) {
+      const treeType = `tree${generateRandomPosition(0, 3)}`; // Select random tree model
+      const treeX = generateRandomPosition(-laneWidth / 2 + 0.5, laneWidth / 2 - 0.5);
+      const tree = new Entity
+      (treeType, models, treeX, -0.4, zPosition);
+      scene.add(tree.model);
+      lane.entities.push(tree);
+    }
+    */
+
+    return lane;
+}
+
+function generateLanes(numLanes,models) {
+    lanes = [];
+    let zPosition = 0;
+    for (let i = 0; i < numLanes; i++) {
+        const laneType = i === 0 ? 'field' : generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
+        const lane = createLane(laneType, zPosition, models);
+        lanes.push(lane);
+        zPosition += 1;
+    }
+}
+
+function generateCars(numCars, models) {
+    for (let i = 0; i < numCars; i++) {
+        const laneIndex = generateRandomPosition(0, lanes.length - 1);
+        const carZPosition = lanes[laneIndex].zPosition - 0.5;
+        const carXPosition = generateRandomPosition(-laneWidth / 2 + 0.5, laneWidth / 2 - 0.5);
+        const orange_car = new Entity("orange_car", models, carXPosition, 0.2, carZPosition);
+        orange_car.model.rotateY(Math.PI / 2);
+        cars.push(orange_car);
+        scene.add(orange_car.model);
+    }
+}
 function playGame(models) {
     if (models === null || models === undefined) {
         console.error("models null at main");
@@ -69,68 +131,25 @@ function playGame(models) {
     player = new Player("chicken", models, 0, 0, 0);
     scene.add(player.model);
 
-    const grass = new Entity("grass", models, 0, -0.4, 0);
-    scene.add(grass.model);
-    const tree0 = new Entity("tree0", models, 2, 0, 0);
-    scene.add(tree0.model);
-    const tree1 = new Entity("tree1", models, 4, 0, 0);
-    scene.add(tree1.model);
-    const tree2 = new Entity("tree2", models, -2, 0, 0);
-    scene.add(tree2.model);
-    const tree3 = new Entity("tree3", models, -4, 0, 0);
-    scene.add(tree3.model);
-    const blank_road = new Entity("blank_road", models, 0, -0.4, 1);
-    scene.add(blank_road.model);
-    const stripe_road = new Entity("stripe_road", models, 0, -0.4, 2);
-    scene.add(stripe_road.model);
-
-    const orange_car = new Entity("orange_car", models, -10, 0.2, 2);
-    orange_car.model.rotateY(Math.PI / 2);
-    cars.push(orange_car);
-    scene.add(orange_car.model);
-
-    const orange_car1 = new Entity("orange_car", models, -7, 0.2, 1);
-    orange_car1.model.rotateY(Math.PI / 2);
-    cars.push(orange_car1);
-    scene.add(orange_car1.model);
-
+    generateLanes(5, models); 
+    generateCars(3, models);
 
     // Get player position after it's initialized
     const playerPosition = player.getPosition();
 
     // Event listener for keydown
     document.addEventListener('keydown', function (event) {
-        var keyCode = event.keyCode;
-        var movementDistance = 0.1;
-        var deltaX = 0, deltaY = 0, deltaZ = 0;
-        switch (keyCode) {
-            case 37:
-                deltaX = +movementDistance; // sang trai
-                break;
-            case 38:
-                deltaZ = +movementDistance; // sang phai
-                break;
-            case 39:
-                deltaX = -movementDistance; //xuong
-                break;
-            case 40:
-                deltaZ = -movementDistance; // len
-                break;
-        }
+        player.move(event);
+        camera.position.add(player.cameraOffset);
 
-        // Update player position
-        playerPosition.x += deltaX;
-        playerPosition.z += deltaZ;
+        camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
+        camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
 
-        // Set new player position
-        player.setPosition(playerPosition.x, playerPosition.y, playerPosition.z);
-    });
-
+        camera.lookAt(player.model.position);
+    })
 }
 
-camera.position.z = -5;
-camera.position.y = 5;
-orbit.update(); // Move orbit controls update here
+orbit.update();
 
 const collisionThreshold = 1; // Defined ngưỡng va chạm
 
