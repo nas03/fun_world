@@ -131,8 +131,8 @@ function playGame(models) {
     player = new Player("chicken", models, 0, 0, 0);
     scene.add(player.model);
 
-    generateLanes(5, models); 
-    generateCars(3, models);
+    generateLanes(100, models); 
+    generateCars(10, models);
 
     // Get player position after it's initialized
     const playerPosition = player.getPosition();
