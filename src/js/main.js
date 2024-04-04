@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
 import { loadAllModels } from './loadModelFromDish.js';
-import { Entity } from './entities/entity.js';
 import { Player } from './entities/player.js';
+import { generateLanes, generateCars } from './generateMap.js';
 
 const counterDOM = document.getElementById('counter');
 let lanes;
@@ -13,11 +13,13 @@ let previousTimestamp;
 let startMoving;
 let moves;
 let stepStartTimestamp;
+const cars = [];
+var player;
 
-// camera trong game
+//Camera
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(-4.61, 5, -5);
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(-2.61, 7, -5);
 
 const renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -30,10 +32,8 @@ document.body.appendChild(renderer.domElement);
 
 const orbit = new OrbitControls(camera, renderer.domElement);
 
-const axesHelper = new THREE.AxesHelper();
-scene.add(axesHelper);
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+//Light
+const ambientLight = new THREE.AmbientLight(0xffffff, 4);
 scene.add(ambientLight);
 
 const modelPaths = [
@@ -50,79 +50,18 @@ const modelPaths = [
 
 loadAllModels(modelPaths)
     .then((models) => {
-        console.log('Các model đã được load:', models);
-        // Thực hiện các thao tác khác với các model đã load ở đây
         playGame(models);
     })
     .catch((error) => {
         console.error('Lỗi khi load model:', error);
     });
 
-const cars = [];
-var player;
-let roadLength = 20;
-let laneWidth = 2;
-function generateRandomPosition(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
+const initGame = () => {
+
 }
 
-function createLane(laneType, zPosition, models) {
-    const lane = {
-        type: laneType,
-        entities: [],
-    };
-    // Place grass on either side of the lane
-    const grassLeft = new Entity("grass", models, -laneWidth / 2, -0.4, zPosition);
-    scene.add(grassLeft.model);
-    lane.entities.push(grassLeft);
+initGame();
 
-    const grassRight = new Entity("grass", models, laneWidth / 2, -0.4, zPosition);
-    scene.add(grassRight.model);
-    lane.entities.push(grassRight);
-
-    // Place road in the center
-    const roadSegment = new Entity(laneType === 'field' ? "blank_road" : "stripe_road", models, 0, -0.4, zPosition);
-    scene.add(roadSegment.model);
-    lane.entities.push(roadSegment);
-
-    // Place trees randomly on the sides (optional)
-    /*
-    const numTrees = generateRandomPosition(1, 3); // Adjust number of trees per lane
-    for (let i = 0; i < numTrees; i++) {
-      const treeType = `tree${generateRandomPosition(0, 3)}`; // Select random tree model
-      const treeX = generateRandomPosition(-laneWidth / 2 + 0.5, laneWidth / 2 - 0.5);
-      const tree = new Entity
-      (treeType, models, treeX, -0.4, zPosition);
-      scene.add(tree.model);
-      lane.entities.push(tree);
-    }
-    */
-
-    return lane;
-}
-
-function generateLanes(numLanes,models) {
-    lanes = [];
-    let zPosition = 0;
-    for (let i = 0; i < numLanes; i++) {
-        const laneType = i === 0 ? 'field' : generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
-        const lane = createLane(laneType, zPosition, models);
-        lanes.push(lane);
-        zPosition += 1;
-    }
-}
-
-function generateCars(numCars, models) {
-    for (let i = 0; i < numCars; i++) {
-        const laneIndex = generateRandomPosition(0, lanes.length - 1);
-        const carZPosition = lanes[laneIndex].zPosition - 0.5;
-        const carXPosition = generateRandomPosition(-laneWidth / 2 + 0.5, laneWidth / 2 - 0.5);
-        const orange_car = new Entity("orange_car", models, carXPosition, 0.2, carZPosition);
-        orange_car.model.rotateY(Math.PI / 2);
-        cars.push(orange_car);
-        scene.add(orange_car.model);
-    }
-}
 function playGame(models) {
     if (models === null || models === undefined) {
         console.error("models null at main");
@@ -131,9 +70,8 @@ function playGame(models) {
     player = new Player("chicken", models, 0, 0, 0);
     scene.add(player.model);
 
-    generateLanes(100, models); 
-    generateCars(10, models);
-
+    generateLanes(10, models, scene);
+    generateCars(10, models, scene)
     // Get player position after it's initialized
     const playerPosition = player.getPosition();
 
