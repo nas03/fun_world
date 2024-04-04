@@ -12,13 +12,9 @@ function createLane(laneType, zPosition, models, scene) {
         entities: [],
     };
     if (laneType === "field") {
-        const grassLeft = new Entity("grass", models, -laneWidth / 2, -0.4, zPosition);
-        scene.add(grassLeft.model);
-        lane.entities.push(grassLeft);
-
-        const grassRight = new Entity("grass", models, laneWidth / 2, -0.4, zPosition);
-        scene.add(grassRight.model);
-        lane.entities.push(grassRight);
+        const grass = new Entity("grass", models, 0, -0.4, zPosition);
+        scene.add(grass.model);
+        lane.entities.push(grass);
 
         const numTrees = generateRandomPosition(1, 3);
         for (let i = 0; i < numTrees; i++) {
