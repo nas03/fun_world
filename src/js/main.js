@@ -13,13 +13,13 @@ let previousTimestamp;
 let startMoving;
 let moves;
 let stepStartTimestamp;
-const cars = [];
+let cars = [];
 var player;
 
 //Camera
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(-2.61, 7, -5);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(-3, 9, -5);
 
 const renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -70,8 +70,8 @@ function playGame(models) {
     player = new Player("chicken", models, 0, 0, 0);
     scene.add(player.model);
 
-    generateLanes(10, models, scene);
-    generateCars(10, models, scene)
+    generateLanes(models, scene);
+    cars = generateCars(10, models, scene)
     // Get player position after it's initialized
     const playerPosition = player.getPosition();
 

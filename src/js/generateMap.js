@@ -42,12 +42,12 @@ function createLane(laneType, zPosition, models, scene) {
     return lane;
 }
 
-export function generateLanes(numLanes, models, scene) {
+export function generateLanes(models, scene) {
     lanes = [];
     let zPosition = 0;
-    for (let i = 0; i < numLanes; i++) {
-        const laneType = i === 0 || i == 1 ? 'field' : generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
-        const lane = createLane(laneType, zPosition, models, scene);
+    for (let i = -9; i <= 12; i++) {
+        const laneType = i <= 0 || i == 1 ? 'field' : generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
+        const lane = createLane(laneType, i, models, scene);
         lanes.push(lane);
         zPosition += 1;
     }
@@ -62,4 +62,5 @@ export function generateCars(numCars, models, scene) {
         cars.push(orange_car);
         scene.add(orange_car.model);
     }
+    return cars;
 }
