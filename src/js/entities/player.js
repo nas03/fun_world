@@ -18,19 +18,19 @@ export class Player extends Entity {
         switch (keyCode) {
             case "ArrowLeft":
                 deltaX = +movementDistance; // sang trai
-                this.jump();
+                this.jump(camera);
                 break;
             case "ArrowRight":
                 deltaX = -movementDistance; //phai
-                this.jump();
+                this.jump(camera);
                 break;
             case "ArrowDown":
                 deltaZ = -movementDistance; // xuong
-                this.jump();
+                this.jump(camera);
                 break;
             case "ArrowUp":
                 deltaZ = +movementDistance; // len
-                this.jump();
+                this.jump(camera);
                 break;
         }
 
@@ -41,16 +41,16 @@ export class Player extends Entity {
         this.setPosition(this.posX, 0, this.posZ);
         this.model.lookAt(this.targetX, 0, this.targetZ);
 
-        const boundingBox = new THREE.Box3().setFromObject(this.model);
-        const center = new THREE.Vector3();
-        boundingBox.getCenter(center);
+        // const boundingBox = new THREE.Box3().setFromObject(this.model);
+        // const center = new THREE.Vector3();
+        // boundingBox.getCenter(center);
 
 
-        camera.position.set(center.x + 3, center.y + 10, center.z - 6)
-        const targetPosition = new THREE.Vector3(center.x + 3, center.y + 10, center.z - 6)
-        camera.lookAt(center)
+        // camera.position.set(center.x + 3, center.y + 10, center.z - 6)
+        // const targetPosition = new THREE.Vector3(center.x + 3, center.y + 10, center.z - 6)
+        // camera.lookAt(center)
 
-        
+
 
         this.cameraOffset = new Vector3(deltaX, 0, deltaZ);
     }
@@ -59,17 +59,17 @@ export class Player extends Entity {
 
     }
 
-    jump() {
+    jump(camera) {
         if (!this.isJumping) {
             this.isJumping = true;
             this.startTime = Date.now();
             this.jumpStartPosY = this.model.position.y;
-            this.animate();
+            this.animate(camera);
         }
     }
 
 
-    animate() {
+    animate(camera) {
         const jumpHeight = 0.75; // Độ cao của nhảy
         const duration = 400; // Thời gian của mỗi nhảy (milliseconds)
 
@@ -84,8 +84,17 @@ export class Player extends Entity {
         this.model.position.x = horizontalPosition;
         this.model.position.z = verticalPosition;
 
+        const boundingBox = new THREE.Box3().setFromObject(this.model);
+        const center = new THREE.Vector3();
+        boundingBox.getCenter(center);
+
+
+        camera.position.set(center.x + 3, 10, center.z - 6)
+        const targetPosition = new THREE.Vector3(center.x, 0, center.z)
+        camera.lookAt(targetPosition)
+
         if (elapsedTime < duration) {
-            requestAnimationFrame(() => this.animate());
+            requestAnimationFrame(() => this.animate(camera));
         } else {
             this.isJumping = false;
             // Reset player position to ground level
