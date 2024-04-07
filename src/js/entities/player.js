@@ -1,6 +1,7 @@
 import { Entity } from "./entity";
 import { Vector3 } from "three";
 import * as THREE from 'three';
+// import * as TWEEN from '@tweenjs/tween.js';
 
 export class Player extends Entity {
     cameraOffset;
@@ -41,23 +42,11 @@ export class Player extends Entity {
         this.setPosition(this.posX, 0, this.posZ);
         this.model.lookAt(this.targetX, 0, this.targetZ);
 
-        // const boundingBox = new THREE.Box3().setFromObject(this.model);
-        // const center = new THREE.Vector3();
-        // boundingBox.getCenter(center);
-
-
-        // camera.position.set(center.x + 3, center.y + 10, center.z - 6)
-        // const targetPosition = new THREE.Vector3(center.x + 3, center.y + 10, center.z - 6)
-        // camera.lookAt(center)
-
-
 
         this.cameraOffset = new Vector3(deltaX, 0, deltaZ);
     }
 
-    moveCamera(camera, targetPosition) {
 
-    }
 
     jump(camera) {
         if (!this.isJumping) {

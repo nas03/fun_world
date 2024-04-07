@@ -50,6 +50,7 @@ scene.add(ambientLight);
 
 const modelPaths = [
     { path: ['../assets/models/characters/chicken/0.obj', '../assets/models/characters/chicken/0.png'], type: ["chicken", "player"] },
+    { path: ['../assets/models/characters/bacon/bacon.obj', '../assets/models/characters/bacon/bacon.png'], type: ["bacon", "player"] },
     { path: ['../assets/models/environment/grass/model.obj', '../assets/models/environment/grass/light-grass.png'], type: ["grass", "land"] },
     { path: ['../assets/models/environment/tree/0/0.obj', '../assets/models/environment/tree/0/0.png'], type: ["tree0", "tree"] },
     { path: ['../assets/models/environment/tree/1/0.obj', '../assets/models/environment/tree/1/0.png'], type: ["tree1", "tree"] },
@@ -82,7 +83,7 @@ function playGame(models) {
         console.error("models null at main");
     }
 
-    player = new Player("chicken", models, 0, 0, 0);
+    player = new Player("bacon", models, 0, 0, 0);
 
     const boundingBox = new THREE.Box3().setFromObject(player.model);
     const center = new THREE.Vector3();
@@ -95,8 +96,7 @@ function playGame(models) {
 
     generateLanes(models, scene);
     cars = generateCars(10, models, scene)
-    // Get player position after it's initialized
-    const playerPosition = player.getPosition();
+   
 
     // Event listener for keydown
     document.addEventListener('keydown', (event) => {
