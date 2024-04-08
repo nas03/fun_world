@@ -80,7 +80,7 @@ function playGame(models) {
         console.error("models null at main");
     }
 
-    player = new Player("bacon", models, 0, 0, 0);
+    player = new Player("chicken", models, 0, 0, 0);
 
     const boundingBox = new THREE.Box3().setFromObject(player.model);
     const center = new THREE.Vector3();
@@ -94,14 +94,7 @@ function playGame(models) {
     generateLanes(models, scene);
     cars = generateCars(10, models, scene)
    
-
-    // Event listener for keydown
-    document.addEventListener('keydown', (event) => {
-        if (!event.repeat) {
-            player.move(event, camera);
-
-        }
-    })
+    player.play()
 }
 
 orbit.update();
