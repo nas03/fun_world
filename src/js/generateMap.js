@@ -19,7 +19,7 @@ function createLane(laneType, zPosition, models, scene) {
         const numTrees = generateRandomPosition(1, 3);
         for (let i = 0; i < numTrees; i++) {
             const treeType = `tree${generateRandomPosition(0, 3)}`;
-            const treeX = generateRandomPosition(-laneWidth / 2 + 0.5, laneWidth / 2 - 0.5);
+            const treeX = generateRandomPosition(-laneWidth, laneWidth);
             const tree = new Entity
                 (treeType, models, treeX, 0, zPosition);
             scene.add(tree.model);

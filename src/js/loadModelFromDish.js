@@ -1,24 +1,54 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'three';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { TextureLoader } from 'three/src/loaders/TextureLoader';
 
 // Hàm để load model
 async function loadModel(modelPath) {
     return new Promise((resolve, reject) => {
-        const loader = new GLTFLoader();
+        // Khai báo loaders
+        const objLoader = new OBJLoader();
+        const textureLoader = new THREE.TextureLoader(); // Sử dụng TextureLoader từ THREE
+        // Tải mô hình OBJ
+        objLoader.load(
+            modelPath[0],
+            (object) => {
+                // Tải texture PNG
+                textureLoader.load(
+                    modelPath[1],
+                    (texture) => {
+                        // Lặp qua tất cả các vật liệu trong mô hình và áp dụng texture
+                        object.traverse((child) => {
+                            if (child instanceof THREE.Mesh) {
+                                // Tạo vật liệu mới với texture đã tải
+                                const material = new THREE.MeshPhongMaterial({ map: texture });
+                                // Áp dụng vật liệu mới cho mỗi mặt trong mô hình
+                                child.material = material;
+                                child.castShadow = true; // Áp dụng castShadow cho từng vật thể con
+                                child.receiveShadow = true;
 
-        loader.load(
-            modelPath,
-            (gltf) => {
-                // Model đã được load thành công
-                resolve(gltf.scene);
+                            }
+                        });
+
+                        // Trả về scene của mô hình
+                        resolve(object);
+                    },
+                    undefined,
+                    (error) => {
+                        reject(error);
+                    }
+                );
             },
-            undefined, // Không cần callback progress ở đây
+            undefined,
             (error) => {
-                // Xảy ra lỗi khi load model
                 reject(error);
             }
         );
     });
 }
+
+
+
 
 // Hàm để load tất cả các model và trả về một mảng chứa các đối tượng có dạng {type: "grass", model: model}
 export async function loadAllModels(modelPaths) {
@@ -26,7 +56,20 @@ export async function loadAllModels(modelPaths) {
         const models = [];
         for (const modelPath of modelPaths) {
             const model = await loadModel(modelPath.path);
-            models.push({ type: modelPath.type, model: model });
+
+            const boundingBox = new THREE.Box3().setFromObject(model);
+            const size = new THREE.Vector3();
+            boundingBox.getSize(size);
+
+            let scale = 0;
+            if (modelPath.type[1] === "land" || modelPath.type[1] === "road") {
+                scale = 1 / Math.min(size.x, size.z);
+            } else {
+                scale = 1 / Math.max(size.x, size.z);
+            }
+
+            model.scale.set(scale, scale, scale);
+            models.push({ type: modelPath.type[0], model: model });
         }
         return models;
     } catch (error) {
