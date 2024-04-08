@@ -14,7 +14,7 @@ function createLane(laneType, zPosition, models, scene) {
     if (laneType === "field") {
         const grass = new Entity("grass", models, 0, -0.4, zPosition);
         scene.add(grass.model);
-        lane.entities.push(grass);
+        lane.entities.push(grass); 
 
         const numTrees = generateRandomPosition(1, 3);
         for (let i = 0; i < numTrees; i++) {
@@ -34,9 +34,9 @@ function createLane(laneType, zPosition, models, scene) {
         scene.add(stripe_road.model);
         lane.entities.push(stripe_road);
 
-        const numCars = generateRandomPosition(1, 3); // Adjust car density as desired
+        const numCars = generateRandomPosition(1, 3);
         for (let i = 0; i < numCars; i++) {
-          const carXPosition = generateRandomPosition(-laneWidth / 2 + 1, laneWidth / 2 - 1); // Adjust car positioning within lane
+          const carXPosition = generateRandomPosition(-laneWidth / 2 + 1, laneWidth / 2 - 1); 
           const carZPosition = zPosition - 0.5;
           const orange_car = new Entity("orange_car", models, carXPosition, 0.2, carZPosition);
           orange_car.model.rotateY(Math.PI / 2);
@@ -51,7 +51,7 @@ function createLane(laneType, zPosition, models, scene) {
 export function generateLanes(models, scene) {
     lanes = [];
     let zPosition = 0;
-    for (let i = -9; i <= 12; i++) {
+    for (let i = -9; i <= 15; i++) {
         const laneType = i <= 0 || i == 1 ? 'field' : generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
         const lane = createLane(laneType, i, models, scene);
         lanes.push(lane);

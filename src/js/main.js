@@ -145,4 +145,4 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-animate(cars);
+animate();
