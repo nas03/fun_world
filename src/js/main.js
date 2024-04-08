@@ -14,7 +14,7 @@ let startMoving;
 let moves;
 let stepStartTimestamp;
 let cars = [];
-var player;
+let player;
 
 //Camera
 const scene = new THREE.Scene();
@@ -75,16 +75,22 @@ function playGame(models) {
     // Get player position after it's initialized
     const playerPosition = player.getPosition();
 
+    let pressedKey = false;
     // Event listener for keydown
     document.addEventListener('keydown', (event) => {
-        if (!event.repeat) {
-            player.move(event);
-            camera.position.add(player.cameraOffset);
+        if (!pressedKey) {
+        pressedKey = true;
+        setTimeout(() => {
+            pressedKey = false;
+        } , player.duration)
+        
+        player.move(event);
+        camera.position.add(player.cameraOffset);
 
-            camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
-            camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
+        camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
+        camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
 
-            camera.lookAt(player.model.position);
+        camera.lookAt(player.model.position);
         }
     })
 }

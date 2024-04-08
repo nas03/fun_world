@@ -4,6 +4,7 @@ import { Vector3 } from "three";
 export class Player extends Entity {
     cameraOffset;
     isJumping = false;
+    duration = 400; // Thời gian mỗi animation
 
     constructor(type, models, x, y, z) {
         super(type, models, x, y, z);
@@ -54,10 +55,9 @@ export class Player extends Entity {
 
     animate() {
         const jumpHeight = 0.75; // Độ cao của nhảy
-        const duration = 400; // Thời gian của mỗi nhảy (milliseconds)
 
         const elapsedTime = Date.now() - this.startTime;
-        const progress = Math.min(elapsedTime / duration, 1); // Ensure jump completes within duration
+        const progress = Math.min(elapsedTime / this.duration, 1); // Ensure jump completes within duration
     
         const jumpPosition = this.jumpStartPosY + jumpHeight * Math.sin(Math.PI * progress);
         const horizontalPosition = this.posX + (this.targetX - this.posX) * progress;
@@ -67,7 +67,7 @@ export class Player extends Entity {
         this.model.position.x = horizontalPosition;
         this.model.position.z = verticalPosition;
 
-        if (elapsedTime < duration) {
+        if (elapsedTime < this.duration) {
             requestAnimationFrame(() => this.animate());
         } else {
             this.isJumping = false;
