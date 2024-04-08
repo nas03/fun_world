@@ -26,13 +26,23 @@ function createLane(laneType, zPosition, models, scene) {
             lane.entities.push(tree);
         }
     } else {
-        const blank_road = new Entity("blank_road", models, 0, -0.4, zPosition);
-        scene.add(blank_road.model);
-        lane.entities.push(blank_road);
+        // const blank_road = new Entity("blank_road", models, 0, -0.4, zPosition);
+        // scene.add(blank_road.model);
+        // lane.entities.push(blank_road);
 
-        const stripe_road = new Entity("stripe_road", models, 0, -0.4, zPosition + 1);
+        const stripe_road = new Entity("stripe_road", models, 0, -0.4, zPosition );
         scene.add(stripe_road.model);
         lane.entities.push(stripe_road);
+
+        const numCars = generateRandomPosition(1, 3); // Adjust car density as desired
+        for (let i = 0; i < numCars; i++) {
+          const carXPosition = generateRandomPosition(-laneWidth / 2 + 1, laneWidth / 2 - 1); // Adjust car positioning within lane
+          const carZPosition = zPosition - 0.5;
+          const orange_car = new Entity("orange_car", models, carXPosition, 0.2, carZPosition);
+          orange_car.model.rotateY(Math.PI / 2);
+          cars.push(orange_car);
+          scene.add(orange_car.model);
+        }
     }
 
     return lane;

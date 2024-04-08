@@ -71,7 +71,6 @@ function playGame(models) {
     scene.add(player.model);
 
     generateLanes(models, scene);
-    cars = generateCars(10, models, scene)
     // Get player position after it's initialized
     const playerPosition = player.getPosition();
 
