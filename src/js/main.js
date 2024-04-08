@@ -67,32 +67,13 @@ function playGame(models) {
         console.error("models null at main");
     }
 
-    player = new Player("chicken", models, 0, 0, 0);
+    player = new Player("chicken", models, 0, 0, 0, camera);
     scene.add(player.model);
 
     generateLanes(models, scene);
     cars = generateCars(10, models, scene)
-    // Get player position after it's initialized
-    const playerPosition = player.getPosition();
 
-    let pressedKey = false;
-    // Event listener for keydown
-    document.addEventListener('keydown', (event) => {
-        if (!pressedKey) {
-        pressedKey = true;
-        setTimeout(() => {
-            pressedKey = false;
-        } , player.duration)
-        
-        player.move(event);
-        camera.position.add(player.cameraOffset);
-
-        camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
-        camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
-
-        camera.lookAt(player.model.position);
-        }
-    })
+    player.play();
 }
 
 orbit.update();
