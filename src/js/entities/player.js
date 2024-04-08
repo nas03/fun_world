@@ -2,45 +2,61 @@ import { Entity } from "./entity";
 import { Vector3 } from "three";
 
 export class Player extends Entity {
-    cameraOffset;
-    isJumping = false;
-
-    constructor(type, models, x, y, z) {
+    constructor(type, models, x, y, z, camera) {
         super(type, models, x, y, z);
+        this.camera = camera;
+        this.isJumping = false;
+        this.duration = 400; // Thời gian mỗi animation
     }
 
-    move(event) {
-        let keyCode = event.code;
+    play() {
         const movementDistance = 1;
-        let deltaX = 0, deltaZ = 0;
+        let pressedKey = false;
 
-        switch (keyCode) {
-            case "ArrowLeft":
-                deltaX = +movementDistance; // sang trai
-                this.jump();
-                break;
-            case "ArrowRight":
-                deltaX = -movementDistance; //phai
-                this.jump();
-                break;
-            case "ArrowDown":
-                deltaZ = -movementDistance; // xuong
-                this.jump();
-                break;
-            case "ArrowUp":
-                deltaZ = +movementDistance; // len
-                this.jump();
-                break;
-        }
+        // Event listener for keydown
+        document.addEventListener('keydown', (event) => {
+            if (!pressedKey) {
+                pressedKey = true;
+                setTimeout(() => {
+                    pressedKey = false;
+                } , this.duration)
+                
+                let keyCode = event.code;
+                let deltaX = 0, deltaZ = 0;
 
-        // Update player position
-        this.targetX = this.posX + deltaX;
-        this.targetZ = this.posZ + deltaZ;
+                switch (keyCode) {
+                    case "ArrowLeft":
+                        deltaX = +movementDistance; // sang trai
+                        this.jump();
+                        break;
+                    case "ArrowRight":
+                        deltaX = -movementDistance; //phai
+                        this.jump();
+                        break;
+                    case "ArrowDown":
+                        deltaZ = -movementDistance; // xuong
+                        this.jump();
+                        break;
+                    case "ArrowUp":
+                        deltaZ = +movementDistance; // len
+                        this.jump();
+                        break;
+                }
 
-        this.setPosition(this.posX, 0, this.posZ);
-        this.model.lookAt(this.targetX, 0, this.targetZ);
+                // Update player position
+                this.targetX = this.posX + deltaX;
+                this.targetZ = this.posZ + deltaZ;
 
-        this.cameraOffset = new Vector3(deltaX, 0, deltaZ);
+                this.setPosition(this.posX, 0, this.posZ);
+                this.model.lookAt(this.targetX, 0, this.targetZ);
+
+                const cameraOffset = new Vector3(deltaX, 0, deltaZ);
+                this.camera.position.add(cameraOffset);
+                this.camera.position.x = Math.max(-10, Math.min(10, this.camera.position.x));
+                this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));
+                this.camera.lookAt(this.model.position);
+            }
+        })
     }
 
     jump() {
@@ -54,10 +70,9 @@ export class Player extends Entity {
 
     animate() {
         const jumpHeight = 0.75; // Độ cao của nhảy
-        const duration = 400; // Thời gian của mỗi nhảy (milliseconds)
 
         const elapsedTime = Date.now() - this.startTime;
-        const progress = Math.min(elapsedTime / duration, 1); // Ensure jump completes within duration
+        const progress = Math.min(elapsedTime / this.duration, 1); // Ensure jump completes within duration
     
         const jumpPosition = this.jumpStartPosY + jumpHeight * Math.sin(Math.PI * progress);
         const horizontalPosition = this.posX + (this.targetX - this.posX) * progress;
@@ -67,7 +82,7 @@ export class Player extends Entity {
         this.model.position.x = horizontalPosition;
         this.model.position.z = verticalPosition;
 
-        if (elapsedTime < duration) {
+        if (elapsedTime < this.duration) {
             requestAnimationFrame(() => this.animate());
         } else {
             this.isJumping = false;

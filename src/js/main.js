@@ -14,7 +14,7 @@ let startMoving;
 let moves;
 let stepStartTimestamp;
 let cars = [];
-var player;
+let player;
 
 //Camera
 const scene = new THREE.Scene();
@@ -67,25 +67,13 @@ function playGame(models) {
         console.error("models null at main");
     }
 
-    player = new Player("chicken", models, 0, 0, 0);
+    player = new Player("chicken", models, 0, 0, 0, camera);
     scene.add(player.model);
 
     generateLanes(models, scene);
-    // Get player position after it's initialized
-    const playerPosition = player.getPosition();
+    cars = generateCars(10, models, scene)
 
-    // Event listener for keydown
-    document.addEventListener('keydown', (event) => {
-        if (!event.repeat) {
-            player.move(event);
-            camera.position.add(player.cameraOffset);
-
-            camera.position.x = Math.max(-10, Math.min(10, camera.position.x));
-            camera.position.z = Math.max(-10, Math.min(10, camera.position.z));
-
-            camera.lookAt(player.model.position);
-        }
-    })
+    player.play();
 }
 
 orbit.update();
