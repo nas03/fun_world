@@ -1,6 +1,4 @@
-import * as THREE from 'three';
-
-class Entity {
+export class Entity {
     constructor(type, models, x, y, z) {
         this.type = type;
         this.model = null; // Initialize model as null
@@ -33,5 +31,3 @@ class Entity {
         return { x: this.posX, y: this.posY, z: this.posZ };
     }
 }
-
-export { Entity };
