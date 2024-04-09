@@ -52,10 +52,17 @@ export class Player extends Entity {
                 this.setPosition(this.posX, 0, this.posZ);
                 this.model.lookAt(this.targetX, 0, this.targetZ);
 
+                // const cameraOffset = new Vector3(deltaX, 0, deltaZ);
+                // this.camera.position.add(cameraOffset);
+                // this.camera.position.x = Math.max(-10, Math.min(10, this.camera.position.x));
+                // this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));
+                // this.camera.lookAt(this.model.position);
+
                 const cameraOffset = new Vector3(deltaX, 0, deltaZ);
                 this.camera.position.add(cameraOffset);
-                this.camera.position.x = Math.max(-10, Math.min(10, this.camera.position.x));
-                this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));
+                this.camera.position.x = Math.max(-laneWidth * lanes.length / 2, Math.min(laneWidth * lanes.length / 2, this.camera.position.x));
+                this.camera.position.z = Math.max(-lanes.length * 2, Math.min(lanes.length * 2, this.camera.position.z));
+
                 this.camera.lookAt(this.model.position);
             }
         })

@@ -28,10 +28,6 @@ export function createLane(laneType, zPosition, models, scene) {
         }
 
     } else {
-        // const blank_road = new Entity("blank_road", models, 0, -0.4, zPosition);
-        // scene.add(blank_road.model);
-        // lane.entities.push(blank_road);
-
         const stripe_road = new Entity("stripe_road", models, 0, -0.4, zPosition);
         scene.add(stripe_road.model);
         lane.entities.push(stripe_road);

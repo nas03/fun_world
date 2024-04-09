@@ -6,14 +6,6 @@ import { generateLanes, generateCars } from './generateMap.js';
 import { TextureLoader } from 'three';
 
 const counterDOM = document.getElementById('counter');
-let lanes;
-let currentLane;
-let currentColumn;
-
-let previousTimestamp;
-let startMoving;
-let moves;
-let stepStartTimestamp;
 let cars = [];
 var player;
 
