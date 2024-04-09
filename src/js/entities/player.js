@@ -13,7 +13,7 @@ export class Player extends Entity {
 
     play(models, scene) {
         const movementDistance = 1;
-        let pressedKey = false;
+        let pressedKey = false; 
 
         // Event listener for keydown
         document.addEventListener('keydown', (event) => {

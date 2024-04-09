@@ -10,7 +10,7 @@ export function createLane(laneType, zPosition, models, scene) {
     const lane = {
         type: laneType,
         entities: [],
-    };
+    }; 
     if (laneType === "field") {
         const grass = new Entity("grass", models, 0, -0.4, zPosition);
         scene.add(grass.model);
@@ -28,7 +28,7 @@ export function createLane(laneType, zPosition, models, scene) {
         }
 
     } else {
-        const stripe_road = new Entity("stripe_road", models, 0, -0.4, zPosition);
+        const stripe_road = new Entity("stripe_road", models, 0, -0.4, zPosition + 0.1);
         scene.add(stripe_road.model);
         lane.entities.push(stripe_road);
 
