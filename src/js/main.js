@@ -1,128 +1,95 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
 import { loadAllModels } from './loadModelFromDish.js';
-import { Entity } from './entities/entity.js';
+import { Player } from './entities/player.js';
+import { generateLanes, generateCars } from './generateMap.js';
+import { TextureLoader } from 'three';
 
+const counterDOM = document.getElementById('counter');
+let cars = [];
+var player;
+
+//Camera
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.rotateY(Math.PI);
-camera.updateMatrixWorld();
-const renderer = new THREE.WebGLRenderer();
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(-2, 6, -4);
+
+const renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true
+});
 renderer.setClearColor(0xcccccc);
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const orbit = new OrbitControls(camera, renderer.domElement);
 
-const axesHelper = new THREE.AxesHelper();
-scene.add(axesHelper);
+//Light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Màu trắng, intensity 1
+directionalLight.position.set(-6, 6, -6);
+directionalLight.castShadow = true;
+directionalLight.intensity = 5;
+directionalLight.shadow.camera.left = -15; // Điểm bắt đầu bên trái của phạm vi camera
+directionalLight.shadow.camera.right = 15; // Điểm kết thúc bên phải của phạm vi camera
+directionalLight.shadow.camera.top = 15; // Điểm kết thúc phía trên của phạm vi camera
+directionalLight.shadow.camera.bottom = -15; // Điểm bắt đầu phía dưới của phạm vi camera
+scene.add(directionalLight);
 
-const gridHelper = new THREE.GridHelper(10, 10);
-gridHelper.position.set(0, 0, 0);
-scene.add(gridHelper);
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 2); // White light, intensity 2
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
-
-
 const modelPaths = [
-    { path: '../assets/chicken.glb', type: "chicken" },
-    { path: '../assets/grass.glb', type: "grass" },
-    { path: '../assets/tree0.glb', type: "tree0" },
-    { path: '../assets/tree1.glb', type: "tree1" },
-    { path: '../assets/tree2.glb', type: "tree2" },
-    { path: '../assets/tree3.glb', type: "tree3" },
-    { path: '../assets/blank_road.glb', type: "blank_road" },
-    { path: '../assets/stripe_road.glb', type: "stripe_road" },
-    { path: '../assets/orange_car.glb', type: "orange_car" }
+    { path: ['../assets/models/characters/chicken/0.obj', '../assets/models/characters/chicken/0.png'], type: ["chicken", "player"] },
+    { path: ['../assets/models/characters/bacon/bacon.obj', '../assets/models/characters/bacon/bacon.png'], type: ["bacon", "player"] },
+    { path: ['../assets/models/environment/grass/model.obj', '../assets/models/environment/grass/light-grass.png'], type: ["grass", "land"] },
+    { path: ['../assets/models/environment/tree/0/0.obj', '../assets/models/environment/tree/0/0.png'], type: ["tree0", "tree"] },
+    { path: ['../assets/models/environment/tree/1/0.obj', '../assets/models/environment/tree/1/0.png'], type: ["tree1", "tree"] },
+    { path: ['../assets/models/environment/tree/2/0.obj', '../assets/models/environment/tree/2/0.png'], type: ["tree2", "tree"] },
+    { path: ['../assets/models/environment/tree/3/0.obj', '../assets/models/environment/tree/3/0.png'], type: ["tree3", "tree"] },
+    { path: ['../assets/models/environment/road/model.obj', "../assets/models/environment/road/blank-texture.png"], type: ["blank_road", "road"] },
+    { path: ['../assets/models/environment/road/model.obj', "../assets/models/environment/road/stripes-texture.png"], type: ["stripe_road", "road"] },
+    { path: ['../assets/models/vehicles/orange_car/0.obj', '../assets/models/vehicles/orange_car/0.png'], type: ["orange_car", "car"] }
 ];
 
-// Load tất cả các model
 loadAllModels(modelPaths)
     .then((models) => {
-        console.log('Các model đã được load:', models);
-        // Thực hiện các thao tác khác với các model đã load ở đây
         playGame(models);
     })
     .catch((error) => {
         console.error('Lỗi khi load model:', error);
     });
 
-var player;
-var cars = [];
-function playGame(models) {
-    if (models === null || models === undefined)
-        console.error("models null at main");
-    else
-        console.error("models not null at main");
-
-    player = new Entity("chicken", models, 0, 0, 0);
-    scene.add(player.model);
-
-    const grass = new Entity("grass", models, 0, -0.4, 0);
-    scene.add(grass.model);
-    const tree0 = new Entity("tree0", models, 2, 0, 0);
-    scene.add(tree0.model);
-    const tree1 = new Entity("tree1", models, 4, 0, 0);
-    scene.add(tree1.model);
-    const tree2 = new Entity("tree2", models, -2, 0, 0);
-    scene.add(tree2.model);
-    const tree3 = new Entity("tree3", models, -4, 0, 0);
-    scene.add(tree3.model);
-    const blank_road = new Entity("blank_road", models, 0, 0, 1);
-    scene.add(blank_road.model);
-    const stripe_road = new Entity("stripe_road", models, 0, 0, 2);
-    scene.add(stripe_road.model);
-
-
-    const orange_car = new Entity("orange_car", models, -10, 0.2, 2);
-    orange_car.model.rotateY(Math.PI / 2);
-    cars.push(orange_car);
-    scene.add(orange_car.model);
-
-    const orange_car1 = new Entity("orange_car", models, -7, 0.2, 1);
-    orange_car1.model.rotateY(Math.PI / 2);
-    cars.push(orange_car1);
-    scene.add(orange_car1.model);
-
-
-    // Get player position after it's initialized
-    const playerPosition = player.getPosition();
-
-    // Event listener for keydown
-    document.addEventListener('keydown', function (event) {
-        var keyCode = event.keyCode;
-        var movementDistance = 0.1;
-        var deltaX = 0, deltaY = 0, deltaZ = 0;
-        switch (keyCode) {
-            case 37:
-                deltaX = +movementDistance; // sang trai
-                break;
-            case 38:
-                deltaZ = +movementDistance; // sang phai
-                break;
-            case 39:
-                deltaX = -movementDistance; //xuong
-                break;
-            case 40:
-                deltaZ = -movementDistance; // len
-                break;
-        }
-
-        // Update player position
-        playerPosition.x += deltaX;
-        playerPosition.z += deltaZ;
-
-        // Set new player position
-        player.setPosition(playerPosition.x, playerPosition.y, playerPosition.z);
-    });
+const initGame = () => {
 
 }
 
-camera.position.z = -5;
-camera.position.y = 5;
-orbit.update(); // Move orbit controls update here
+initGame();
+
+function playGame(models) {
+    if (models === null || models === undefined) {
+        console.error("models null at main");
+    }
+
+    player = new Player("chicken", models, 0, 0, 0, camera);
+
+    const boundingBox = new THREE.Box3().setFromObject(player.model);
+    const center = new THREE.Vector3();
+    boundingBox.getCenter(center);
+
+    camera.position.set(center.x + 3, center.y + 10, center.z - 6)
+    camera.lookAt(center)
+
+    scene.add(player.model);
+
+    generateLanes(models, scene);
+    cars = generateCars(10, models, scene)
+   
+    player.play(models, scene)
+}
+
+orbit.update();
 
 const collisionThreshold = 1; // Defined ngưỡng va chạm
 
@@ -162,8 +129,6 @@ function endGame() {
 function animate() {
     requestAnimationFrame(animate);
     checkCollisions();
-
-    console.error(cars.length);
     const carArray = Object.values(cars);
     carArray.forEach(car => {
         const carPos = car.model.position; // Fix the access to position property
@@ -171,4 +136,5 @@ function animate() {
     });
     renderer.render(scene, camera);
 }
-animate(cars);
+
+animate();
