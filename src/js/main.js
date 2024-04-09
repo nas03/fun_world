@@ -80,7 +80,7 @@ function playGame(models) {
         console.error("models null at main");
     }
 
-    player = new Player("chicken", models, 0, 0, 0);
+    player = new Player("chicken", models, 0, 0, 0, camera);
 
     const boundingBox = new THREE.Box3().setFromObject(player.model);
     const center = new THREE.Vector3();
@@ -94,7 +94,7 @@ function playGame(models) {
     generateLanes(models, scene);
     cars = generateCars(10, models, scene)
    
-    player.play()
+    player.play(models, scene)
 }
 
 orbit.update();

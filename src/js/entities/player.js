@@ -1,6 +1,6 @@
 import { Entity } from "./entity";
 import { Vector3 } from "three";
-
+import { generateRandomPosition, createLane } from '../generateMap.js'
 export class Player extends Entity {
     constructor(type, models, x, y, z, camera) {
         super(type, models, x, y, z);
@@ -9,7 +9,7 @@ export class Player extends Entity {
         this.duration = 400; // Thời gian mỗi animation
     }
 
-    play() {
+    play(models, scene) {
         const movementDistance = 1;
         let pressedKey = false;
 
@@ -19,8 +19,8 @@ export class Player extends Entity {
                 pressedKey = true;
                 setTimeout(() => {
                     pressedKey = false;
-                } , this.duration)
-                
+                }, this.duration)
+
                 let keyCode = event.code;
                 let deltaX = 0, deltaZ = 0;
 
@@ -40,10 +40,12 @@ export class Player extends Entity {
                     case "ArrowUp":
                         deltaZ = +movementDistance; // len
                         this.jump();
+                        this.targetZ = this.posZ + deltaZ;
+                        const laneType = generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
+                        createLane(laneType, this.targetZ + 15, models, scene)
                         break;
                 }
 
-                // Update player position
                 this.targetX = this.posX + deltaX;
                 this.targetZ = this.posZ + deltaZ;
 
@@ -73,7 +75,7 @@ export class Player extends Entity {
 
         const elapsedTime = Date.now() - this.startTime;
         const progress = Math.min(elapsedTime / this.duration, 1); // Ensure jump completes within duration
-    
+
         const jumpPosition = this.jumpStartPosY + jumpHeight * Math.sin(Math.PI * progress);
         const horizontalPosition = this.posX + (this.targetX - this.posX) * progress;
         const verticalPosition = this.posZ + (this.targetZ - this.posZ) * progress;
