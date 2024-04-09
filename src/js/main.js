@@ -123,6 +123,7 @@ function generateCars(numCars, models) {
         scene.add(orange_car.model);
     }
 }
+
 function playGame(models) {
     if (models === null || models === undefined) {
         console.error("models null at main");
