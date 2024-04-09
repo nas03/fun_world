@@ -62,7 +62,7 @@ export async function loadAllModels(modelPaths) {
             boundingBox.getSize(size);
 
             let scale = 0;
-            if (modelPath.type[1] === "land" || modelPath.type[1] === "road") {
+            if (modelPath.type[1] === "land" || modelPath.type[1] === "road" || modelPath.type[1] === "car") {
                 scale = 1 / Math.min(size.x, size.z);
             } else {
                 scale = 1 / Math.max(size.x, size.z);

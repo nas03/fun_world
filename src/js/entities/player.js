@@ -1,69 +1,87 @@
 import { Entity } from "./entity";
 import { Vector3 } from "three";
-import * as THREE from 'three';
-// import * as TWEEN from '@tweenjs/tween.js';
-
+import { generateRandomPosition, createLane } from '../generateMap.js'
 export class Player extends Entity {
-    cameraOffset;
-    isJumping = false;
-
-    constructor(type, models, x, y, z) {
+    constructor(type, models, x, y, z, camera) {
         super(type, models, x, y, z);
+        this.camera = camera;
+        this.isJumping = false;
+        this.duration = 400; // Thời gian mỗi animation
     }
 
-    move(event, camera) {
-        let keyCode = event.code;
+    play(models, scene) {
         const movementDistance = 1;
-        let deltaX = 0, deltaZ = 0;
+        let pressedKey = false;
 
-        switch (keyCode) {
-            case "ArrowLeft":
-                deltaX = +movementDistance; // sang trai
-                this.jump(camera);
-                break;
-            case "ArrowRight":
-                deltaX = -movementDistance; //phai
-                this.jump(camera);
-                break;
-            case "ArrowDown":
-                deltaZ = -movementDistance; // xuong
-                this.jump(camera);
-                break;
-            case "ArrowUp":
-                deltaZ = +movementDistance; // len
-                this.jump(camera);
-                break;
-        }
+        // Event listener for keydown
+        document.addEventListener('keydown', (event) => {
+            if (!pressedKey) {
+                pressedKey = true;
+                setTimeout(() => {
+                    pressedKey = false;
+                }, this.duration)
 
-        // Update player position
-        this.targetX = this.posX + deltaX;
-        this.targetZ = this.posZ + deltaZ;
+                let keyCode = event.code;
+                let deltaX = 0, deltaZ = 0;
 
-        this.setPosition(this.posX, 0, this.posZ);
-        this.model.lookAt(this.targetX, 0, this.targetZ);
+                switch (keyCode) {
+                    case "ArrowLeft":
+                        deltaX = +movementDistance; // sang trai
+                        this.jump();
+                        break;
+                    case "ArrowRight":
+                        deltaX = -movementDistance; //phai
+                        this.jump();
+                        break;
+                    case "ArrowDown":
+                        deltaZ = -movementDistance; // xuong
+                        this.jump();
+                        break;
+                    case "ArrowUp":
+                        deltaZ = +movementDistance; // len
+                        this.jump();
+                        this.targetZ = this.posZ + deltaZ;
+                        const laneType = generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
+                        createLane(laneType, this.targetZ + 15, models, scene)
+                        break;
+                }
 
+                this.targetX = this.posX + deltaX;
+                this.targetZ = this.posZ + deltaZ;
 
-        this.cameraOffset = new Vector3(deltaX, 0, deltaZ);
+                this.setPosition(this.posX, 0, this.posZ);
+                this.model.lookAt(this.targetX, 0, this.targetZ);
+
+                // const cameraOffset = new Vector3(deltaX, 0, deltaZ);
+                // this.camera.position.add(cameraOffset);
+                // this.camera.position.x = Math.max(-10, Math.min(10, this.camera.position.x));
+                // this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));
+                // this.camera.lookAt(this.model.position);
+
+                const cameraOffset = new Vector3(deltaX, 0, deltaZ);
+                this.camera.position.add(cameraOffset);
+                this.camera.position.x = Math.max(-laneWidth * lanes.length / 2, Math.min(laneWidth * lanes.length / 2, this.camera.position.x));
+                this.camera.position.z = Math.max(-lanes.length * 2, Math.min(lanes.length * 2, this.camera.position.z));
+
+                this.camera.lookAt(this.model.position);
+            }
+        })
     }
 
-
-
-    jump(camera) {
+    jump() {
         if (!this.isJumping) {
             this.isJumping = true;
             this.startTime = Date.now();
             this.jumpStartPosY = this.model.position.y;
-            this.animate(camera);
+            this.animate();
         }
     }
 
-
-    animate(camera) {
+    animate() {
         const jumpHeight = 0.75; // Độ cao của nhảy
-        const duration = 400; // Thời gian của mỗi nhảy (milliseconds)
 
         const elapsedTime = Date.now() - this.startTime;
-        const progress = Math.min(elapsedTime / duration, 1); // Ensure jump completes within duration
+        const progress = Math.min(elapsedTime / this.duration, 1); // Ensure jump completes within duration
 
         const jumpPosition = this.jumpStartPosY + jumpHeight * Math.sin(Math.PI * progress);
         const horizontalPosition = this.posX + (this.targetX - this.posX) * progress;
@@ -73,23 +91,14 @@ export class Player extends Entity {
         this.model.position.x = horizontalPosition;
         this.model.position.z = verticalPosition;
 
-        const boundingBox = new THREE.Box3().setFromObject(this.model);
-        const center = new THREE.Vector3();
-        boundingBox.getCenter(center);
-
-
-        camera.position.set(center.x + 3, 10, center.z - 6)
-        const targetPosition = new THREE.Vector3(center.x, 0, center.z)
-        camera.lookAt(targetPosition)
-
-        if (elapsedTime < duration) {
-            requestAnimationFrame(() => this.animate(camera));
+        if (elapsedTime < this.duration) {
+            requestAnimationFrame(() => this.animate());
         } else {
             this.isJumping = false;
             // Reset player position to ground level
             this.model.position.y = this.jumpStartPosY;
             this.posX = Math.max(-10, Math.min(10, this.targetX));
-            this.posZ = Math.max(-10, Math.min(10, this.targetZ));
+            this.posZ = this.targetZ;
         }
     }
 }

@@ -6,14 +6,6 @@ import { generateLanes, generateCars } from './generateMap.js';
 import { TextureLoader } from 'three';
 
 const counterDOM = document.getElementById('counter');
-let lanes;
-let currentLane;
-let currentColumn;
-
-let previousTimestamp;
-let startMoving;
-let moves;
-let stepStartTimestamp;
 let cars = [];
 var player;
 
@@ -61,9 +53,6 @@ const modelPaths = [
     { path: ['../assets/models/vehicles/orange_car/0.obj', '../assets/models/vehicles/orange_car/0.png'], type: ["orange_car", "car"] }
 ];
 
-
-
-
 loadAllModels(modelPaths)
     .then((models) => {
         playGame(models);
@@ -83,7 +72,7 @@ function playGame(models) {
         console.error("models null at main");
     }
 
-    player = new Player("bacon", models, 0, 0, 0);
+    player = new Player("chicken", models, 0, 0, 0, camera);
 
     const boundingBox = new THREE.Box3().setFromObject(player.model);
     const center = new THREE.Vector3();
@@ -97,14 +86,7 @@ function playGame(models) {
     generateLanes(models, scene);
     cars = generateCars(10, models, scene)
    
-
-    // Event listener for keydown
-    document.addEventListener('keydown', (event) => {
-        if (!event.repeat) {
-            player.move(event, camera);
-
-        }
-    })
+    player.play(models, scene)
 }
 
 orbit.update();
@@ -144,19 +126,6 @@ function endGame() {
     player.setPosition(0, 0, 0);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 function animate() {
     requestAnimationFrame(animate);
     checkCollisions();
@@ -168,4 +137,4 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-animate(cars);
+animate();
