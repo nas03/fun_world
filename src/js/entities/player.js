@@ -1,6 +1,8 @@
 import { Entity } from "./entity";
 import { Vector3 } from "three";
 import { generateRandomPosition, createLane } from '../generateMap.js'
+import * as THREE from 'three';
+
 export class Player extends Entity {
     constructor(type, models, x, y, z, camera) {
         super(type, models, x, y, z);
@@ -58,12 +60,12 @@ export class Player extends Entity {
                 // this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));
                 // this.camera.lookAt(this.model.position);
 
-                const cameraOffset = new Vector3(deltaX, 0, deltaZ);
-                this.camera.position.add(cameraOffset);
-                this.camera.position.x = Math.max(-laneWidth * lanes.length / 2, Math.min(laneWidth * lanes.length / 2, this.camera.position.x));
-                this.camera.position.z = Math.max(-lanes.length * 2, Math.min(lanes.length * 2, this.camera.position.z));
+                // const cameraOffset = new Vector3(deltaX, 0, deltaZ);
+                // this.camera.position.add(cameraOffset);
+                // this.camera.position.x = Math.max(-laneWidth * lanes.length / 2, Math.min(laneWidth * lanes.length / 2, this.camera.position.x));
+                // this.camera.position.z = Math.max(-lanes.length * 2, Math.min(lanes.length * 2, this.camera.position.z));
 
-                this.camera.lookAt(this.model.position);
+                // this.camera.lookAt(this.model.position);
             }
         })
     }
@@ -90,6 +92,15 @@ export class Player extends Entity {
         this.model.position.y = jumpPosition;
         this.model.position.x = horizontalPosition;
         this.model.position.z = verticalPosition;
+
+        const boundingBox = new THREE.Box3().setFromObject(this.model);
+        const center = new THREE.Vector3();
+        boundingBox.getCenter(center);
+
+
+        this.camera.position.set(center.x + 3, 10, center.z - 6)
+        const targetPosition = new THREE.Vector3(center.x, 0, center.z)
+        this.camera.lookAt(targetPosition)
 
         if (elapsedTime < this.duration) {
             requestAnimationFrame(() => this.animate());
