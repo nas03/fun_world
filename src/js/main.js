@@ -5,7 +5,6 @@ import { Player } from './entities/player.js';
 import { generateLanes, generateCars } from './generateMap.js';
 import { TextureLoader } from 'three';
 
-const counterDOM = document.getElementById('counter');
 let cars = [];
 var player;
 
