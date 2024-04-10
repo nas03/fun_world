@@ -2,13 +2,15 @@ import { Entity } from "./entity";
 import { Vector3 } from "three";
 import { generateRandomPosition, createLane } from '../generateMap.js'
 const counterDOM = document.getElementById('counter');
-
+const maxScore = document.getElementById('maxScore');
+const currentMaxScore = localStorage.getItem('maxScoreFunWorld')
 export class Player extends Entity {
   constructor(type, models, x, y, z, camera) {
     super(type, models, x, y, z);
     this.camera = camera;
     this.isJumping = false;
     this.duration = 400; // Thời gian mỗi animation
+    this.ScoreNow = 0;
     this.counter = 0
   }
 
@@ -49,6 +51,10 @@ export class Player extends Entity {
             this.counter++;
             if (this.counter > this.ScoreNow) {
               this.ScoreNow = this.counter;
+            }
+            if( this.counter >= currentMaxScore) {
+              localStorage.setItem('maxScoreFunWorld', this.counter)
+              maxScore.innerText = "Max: " + this.ScoreNow
             }
             counterDOM.innerText = this.ScoreNow;
             break;

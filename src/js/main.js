@@ -3,7 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; //
 import { loadAllModels } from './loadModelFromDish.js';
 import { Player } from './entities/player.js';
 import { generateLanes, generateCars } from './generateMap.js';
-import { TextureLoader } from 'three';
+
+const maxScore = document.getElementById('maxScore');
 
 let cars = [];
 var player;
@@ -65,7 +66,13 @@ loadAllModels(modelPaths)
     console.error("Lỗi khi load model:", error);
   });
 
-const initGame = () => {};
+const initGame = () => {
+    if (!localStorage.getItem("maxScoreFunWorld")) {
+        localStorage.setItem("maxScoreFunWorld", 0);
+      }
+      
+      maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld")
+};
 
 initGame();
 
