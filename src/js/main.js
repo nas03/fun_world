@@ -11,12 +11,17 @@ var player;
 
 //Camera
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
 camera.position.set(-2, 6, -4);
 
 const renderer = new THREE.WebGLRenderer({
-    alpha: true,
-    antialias: true
+  alpha: true,
+  antialias: true,
 });
 renderer.setClearColor(0xcccccc);
 renderer.shadowMap.enabled = true
@@ -54,23 +59,21 @@ const modelPaths = [
 ];
 
 loadAllModels(modelPaths)
-    .then((models) => {
-        playGame(models);
-    })
-    .catch((error) => {
-        console.error('Lỗi khi load model:', error);
-    });
+  .then((models) => {
+    playGame(models);
+  })
+  .catch((error) => {
+    console.error("Lỗi khi load model:", error);
+  });
 
-const initGame = () => {
-
-}
+const initGame = () => {};
 
 initGame();
 
 function playGame(models) {
-    if (models === null || models === undefined) {
-        console.error("models null at main");
-    }
+  if (models === null || models === undefined) {
+    console.error("models null at main");
+  }
 
     player = new Player("chicken", models, 0, 0, 0, camera);
 
@@ -94,18 +97,18 @@ orbit.update();
 const collisionThreshold = 1; // Defined ngưỡng va chạm
 
 function checkCollisions() {
-    for (let i = 0; i < cars.length; i++) {
-        const car = cars[i];
-        const carPosition = car.model.position;
-        const distance = player.model.position.distanceTo(carPosition);
-        // Nếu khoảng cách nhỏ hơn ngưỡng va chạm, xem như có va chạm
-        if (distance < collisionThreshold) {
-            endGame();
-            return;
-        }
+  for (let i = 0; i < cars.length; i++) {
+    const car = cars[i];
+    const carPosition = car.model.position;
+    const distance = player.model.position.distanceTo(carPosition);
+    // Nếu khoảng cách nhỏ hơn ngưỡng va chạm, xem như có va chạm
+    if (distance < collisionThreshold) {
+      endGame();
+      return;
     }
+  }
 
-    /*const trees = [tree0, tree1, tree2, tree3];
+  /*const trees = [tree0, tree1, tree2, tree3];
     for (let i = 0; i < trees.length; i++) {
         const tree = trees[i];
         const treePosition = tree.model.position;
@@ -122,19 +125,19 @@ function checkCollisions() {
 }
 
 function endGame() {
-    console.log("Game Over");
-    player.setPosition(0, 0, 0);
+  console.log("Game Over");
+  player.setPosition(0, 0, 0);
 }
 
 function animate() {
-    requestAnimationFrame(animate);
-    checkCollisions();
-    const carArray = Object.values(cars);
-    carArray.forEach(car => {
-        const carPos = car.model.position; // Fix the access to position property
-        car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); // Fix the setting of position
-    });
-    renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+  checkCollisions();
+  const carArray = Object.values(cars);
+  carArray.forEach((car) => {
+    const carPos = car.model.position; // Fix the access to position property
+    car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); // Fix the setting of position
+  });
+  renderer.render(scene, camera);
 }
 
 animate();
