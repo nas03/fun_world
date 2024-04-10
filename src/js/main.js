@@ -1,10 +1,10 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
-import { loadAllModels } from './loadModelFromDish.js';
-import { Player } from './entities/player.js';
-import { generateLanes, generateCars } from './generateMap.js';
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"; // Add '.js' extension
+import { loadAllModels } from "./loadModelFromDish.js";
+import { Player } from "./entities/player.js";
+import { generateLanes, generateCars } from "./generateMap.js";
 
-const counterDOM = document.getElementById('counter');
+// const counterDOM = document.getElementById("counter");
 let lanes;
 let currentLane;
 let currentColumn;
@@ -18,15 +18,20 @@ let player;
 
 //Camera
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
 camera.position.set(-2, 6, -4);
 
 const renderer = new THREE.WebGLRenderer({
-    alpha: true,
-    antialias: true
+  alpha: true,
+  antialias: true,
 });
 renderer.setClearColor(0xcccccc);
-renderer.shadowMap.enabled = true
+renderer.shadowMap.enabled = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -37,43 +42,40 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 4);
 scene.add(ambientLight);
 
 const modelPaths = [
-    { path: '../assets/chicken.glb', type: "chicken" },
-    { path: '../assets/grass.glb', type: "grass" },
-    { path: '../assets/tree0.glb', type: "tree0" },
-    { path: '../assets/tree1.glb', type: "tree1" },
-    { path: '../assets/tree2.glb', type: "tree2" },
-    { path: '../assets/tree3.glb', type: "tree3" },
-    { path: '../assets/blank_road.glb', type: "blank_road" },
-    { path: '../assets/stripe_road.glb', type: "stripe_road" },
-    { path: '../assets/orange_car.glb', type: "orange_car" }
+  { path: "../assets/chicken.glb", type: "chicken" },
+  { path: "../assets/grass.glb", type: "grass" },
+  { path: "../assets/tree0.glb", type: "tree0" },
+  { path: "../assets/tree1.glb", type: "tree1" },
+  { path: "../assets/tree2.glb", type: "tree2" },
+  { path: "../assets/tree3.glb", type: "tree3" },
+  { path: "../assets/blank_road.glb", type: "blank_road" },
+  { path: "../assets/stripe_road.glb", type: "stripe_road" },
+  { path: "../assets/orange_car.glb", type: "orange_car" },
 ];
 
 loadAllModels(modelPaths)
-    .then((models) => {
-        playGame(models);
-    })
-    .catch((error) => {
-        console.error('Lỗi khi load model:', error);
-    });
+  .then((models) => {
+    playGame(models);
+  })
+  .catch((error) => {
+    console.error("Lỗi khi load model:", error);
+  });
 
-const initGame = () => {
-
-}
+const initGame = () => {};
 
 initGame();
 
 function playGame(models) {
-    if (models === null || models === undefined) {
-        console.error("models null at main");
-    }
+  if (models === null || models === undefined) {
+    console.error("models null at main");
+  }
 
-    player = new Player("chicken", models, 0, 0, 0, camera);
-    scene.add(player.model);
+  player = new Player("chicken", models, 0, 0, 0, camera);
+  scene.add(player.model);
 
-    generateLanes(models, scene);
-    cars = generateCars(10, models, scene)
-
-    player.play();
+  generateLanes(models, scene);
+  cars = generateCars(10, models, scene);
+  player.play();
 }
 
 orbit.update();
@@ -81,18 +83,18 @@ orbit.update();
 const collisionThreshold = 1; // Defined ngưỡng va chạm
 
 function checkCollisions() {
-    for (let i = 0; i < cars.length; i++) {
-        const car = cars[i];
-        const carPosition = car.model.position;
-        const distance = player.model.position.distanceTo(carPosition);
-        // Nếu khoảng cách nhỏ hơn ngưỡng va chạm, xem như có va chạm
-        if (distance < collisionThreshold) {
-            endGame();
-            return;
-        }
+  for (let i = 0; i < cars.length; i++) {
+    const car = cars[i];
+    const carPosition = car.model.position;
+    const distance = player.model.position.distanceTo(carPosition);
+    // Nếu khoảng cách nhỏ hơn ngưỡng va chạm, xem như có va chạm
+    if (distance < collisionThreshold) {
+      endGame();
+      return;
     }
+  }
 
-    /*const trees = [tree0, tree1, tree2, tree3];
+  /*const trees = [tree0, tree1, tree2, tree3];
     for (let i = 0; i < trees.length; i++) {
         const tree = trees[i];
         const treePosition = tree.model.position;
@@ -109,19 +111,19 @@ function checkCollisions() {
 }
 
 function endGame() {
-    console.log("Game Over");
-    player.setPosition(0, 0, 0);
+  console.log("Game Over");
+  player.setPosition(0, 0, 0);
 }
 
 function animate() {
-    requestAnimationFrame(animate);
-    checkCollisions();
-    const carArray = Object.values(cars);
-    carArray.forEach(car => {
-        const carPos = car.model.position; // Fix the access to position property
-        car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); // Fix the setting of position
-    });
-    renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+  checkCollisions();
+  const carArray = Object.values(cars);
+  carArray.forEach((car) => {
+    const carPos = car.model.position; // Fix the access to position property
+    car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); // Fix the setting of position
+  });
+  renderer.render(scene, camera);
 }
 
 animate(cars);

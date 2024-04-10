@@ -1,95 +1,117 @@
 import { Entity } from "./entity";
 import { Vector3 } from "three";
 
+const counterDOM = document.getElementById("counter");
+
 export class Player extends Entity {
-    constructor(type, models, x, y, z, camera) {
-        super(type, models, x, y, z);
-        this.camera = camera;
-        this.isJumping = false;
-        this.duration = 400; // Thời gian mỗi animation
-    }
+  constructor(type, models, x, y, z, camera) {
+    super(type, models, x, y, z);
+    this.camera = camera;
+    this.isJumping = false;
+    this.duration = 400; // Thời gian mỗi animation
+    this.ScoreNow = 0;
+    this.counter = 0;
+  }
 
-    play() {
-        const movementDistance = 1;
-        let pressedKey = false;
+  play() {
+    const movementDistance = 1;
+    let pressedKey = false;
 
-        // Event listener for keydown
-        document.addEventListener('keydown', (event) => {
-            if (!pressedKey) {
-                pressedKey = true;
-                setTimeout(() => {
-                    pressedKey = false;
-                } , this.duration)
-                
-                let keyCode = event.code;
-                let deltaX = 0, deltaZ = 0;
+    // Event listener for keydown
+    document.addEventListener("keydown", (event) => {
+      if (!pressedKey) {
+        pressedKey = true;
+        setTimeout(() => {
+          pressedKey = false;
+        }, this.duration);
 
-                switch (keyCode) {
-                    case "ArrowLeft":
-                        deltaX = +movementDistance; // sang trai
-                        this.jump();
-                        break;
-                    case "ArrowRight":
-                        deltaX = -movementDistance; //phai
-                        this.jump();
-                        break;
-                    case "ArrowDown":
-                        deltaZ = -movementDistance; // xuong
-                        this.jump();
-                        break;
-                    case "ArrowUp":
-                        deltaZ = +movementDistance; // len
-                        this.jump();
-                        break;
-                }
+        let keyCode = event.code;
+        let deltaX = 0,
+          deltaZ = 0;
 
-                // Update player position
-                this.targetX = this.posX + deltaX;
-                this.targetZ = this.posZ + deltaZ;
+        switch (keyCode) {
+          case "ArrowLeft":
+            deltaX = +movementDistance; // sang trai
+            this.jump();
+            break;
+          case "ArrowRight":
+            deltaX = -movementDistance; //phai
+            this.jump();
+            break;
+          case "ArrowDown":
+            deltaZ = -movementDistance; // xuong
+            this.counter--;
+            this.jump();
+            console.log("counter: ", this.counter);
 
-                this.setPosition(this.posX, 0, this.posZ);
-                this.model.lookAt(this.targetX, 0, this.targetZ);
-
-                const cameraOffset = new Vector3(deltaX, 0, deltaZ);
-                this.camera.position.add(cameraOffset);
-                this.camera.position.x = Math.max(-10, Math.min(10, this.camera.position.x));
-                this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));
-                this.camera.lookAt(this.model.position);
+            break;
+          case "ArrowUp":
+            deltaZ = +movementDistance; // len
+            this.counter++;
+            if (this.counter > this.ScoreNow) {
+              this.ScoreNow = this.counter;
             }
-        })
-    }
-
-    jump() {
-        if (!this.isJumping) {
-            this.isJumping = true;
-            this.startTime = Date.now();
-            this.jumpStartPosY = this.model.position.y;
-            this.animate();
+            counterDOM.innerText = this.ScoreNow;
+            this.jump();
+            console.log("counter: ", this.counter);
+            break;
         }
+
+        // Update player position
+        this.targetX = this.posX + deltaX;
+        this.targetZ = this.posZ + deltaZ;
+
+        this.setPosition(this.posX, 0, this.posZ);
+        this.model.lookAt(this.targetX, 0, this.targetZ);
+
+        const cameraOffset = new Vector3(deltaX, 0, deltaZ);
+        this.camera.position.add(cameraOffset);
+        this.camera.position.x = Math.max(
+          -10,
+          Math.min(10, this.camera.position.x)
+        );
+        this.camera.position.z = Math.max(
+          -10,
+          Math.min(10, this.camera.position.z)
+        );
+        this.camera.lookAt(this.model.position);
+      }
+    });
+  }
+
+  jump() {
+    if (!this.isJumping) {
+      this.isJumping = true;
+      this.startTime = Date.now();
+      this.jumpStartPosY = this.model.position.y;
+      this.animate();
     }
+  }
 
-    animate() {
-        const jumpHeight = 0.75; // Độ cao của nhảy
+  animate() {
+    const jumpHeight = 0.75; // Độ cao của nhảy
 
-        const elapsedTime = Date.now() - this.startTime;
-        const progress = Math.min(elapsedTime / this.duration, 1); // Ensure jump completes within duration
-    
-        const jumpPosition = this.jumpStartPosY + jumpHeight * Math.sin(Math.PI * progress);
-        const horizontalPosition = this.posX + (this.targetX - this.posX) * progress;
-        const verticalPosition = this.posZ + (this.targetZ - this.posZ) * progress;
+    const elapsedTime = Date.now() - this.startTime;
+    const progress = Math.min(elapsedTime / this.duration, 1); // Ensure jump completes within duration
 
-        this.model.position.y = jumpPosition;
-        this.model.position.x = horizontalPosition;
-        this.model.position.z = verticalPosition;
+    const jumpPosition =
+      this.jumpStartPosY + jumpHeight * Math.sin(Math.PI * progress);
+    const horizontalPosition =
+      this.posX + (this.targetX - this.posX) * progress;
+    const verticalPosition = this.posZ + (this.targetZ - this.posZ) * progress;
 
-        if (elapsedTime < this.duration) {
-            requestAnimationFrame(() => this.animate());
-        } else {
-            this.isJumping = false;
-            // Reset player position to ground level
-            this.model.position.y = this.jumpStartPosY;
-            this.posX = Math.max(-10, Math.min(10, this.targetX));
-            this.posZ = Math.max(-10, Math.min(10, this.targetZ));
-        }
+    this.model.position.y = jumpPosition;
+    this.model.position.x = horizontalPosition;
+    this.model.position.z = verticalPosition;
+
+    if (elapsedTime < this.duration) {
+      requestAnimationFrame(() => this.animate());
+    } else {
+      this.isJumping = false;
+      // Reset player position to ground level
+      this.model.position.y = this.jumpStartPosY;
+      this.posX = Math.max(-10, Math.min(10, this.targetX));
+      this.posZ = Math.max(-10, Math.min(10, this.targetZ));
     }
+  }
 }
