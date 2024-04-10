@@ -55,7 +55,12 @@ const modelPaths = [
     { path: ['../assets/models/environment/tree/3/0.obj', '../assets/models/environment/tree/3/0.png'], type: ["tree3", "tree"] },
     { path: ['../assets/models/environment/road/model.obj', "../assets/models/environment/road/blank-texture.png"], type: ["blank_road", "road"] },
     { path: ['../assets/models/environment/road/model.obj', "../assets/models/environment/road/stripes-texture.png"], type: ["stripe_road", "road"] },
-    { path: ['../assets/models/vehicles/orange_car/0.obj', '../assets/models/vehicles/orange_car/0.png'], type: ["orange_car", "car"] }
+    { path: ['../assets/models/environment/railroad/0.obj', "../assets/models/environment/railroad/0.png"], type: ["railroad", "road"] },
+    { path: ['../assets/models/vehicles/orange_car/0.obj', '../assets/models/vehicles/orange_car/0.png'], type: ["orange_car", "car"] },
+    { path: ['../assets/models/vehicles/blue_truck/0.obj', '../assets/models/vehicles/blue_truck/0.png'], type: ["blue_truck", "car"] },
+    { path: ['../assets/models/vehicles/blue_car/0.obj', '../assets/models/vehicles/blue_car/0.png'], type: ["blue_car", "car"] },
+    { path: ['../assets/models/vehicles/green_car/0.obj', '../assets/models/vehicles/green_car/0.png'], type: ["green_car", "car"] },
+    { path: ['../assets/models/vehicles/police_car/0.obj', '../assets/models/vehicles/police_car/0.png'], type: ["police_car", "car"] },
 ];
 
 loadAllModels(modelPaths)
@@ -92,22 +97,20 @@ function playGame(models) {
 
     scene.add(player.model);
 
-    generateLanes(models, scene);
-    cars = generateCars(10, models, scene)
+    cars = generateLanes(models, scene).cars;
    
     player.play(models, scene)
 }
 
 orbit.update();
 
-const collisionThreshold = 1; // Defined ngưỡng va chạm
+const collisionThreshold = 1; 
 
 function checkCollisions() {
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
     const carPosition = car.model.position;
     const distance = player.model.position.distanceTo(carPosition);
-    // Nếu khoảng cách nhỏ hơn ngưỡng va chạm, xem như có va chạm
     if (distance < collisionThreshold) {
       endGame();
       return;
@@ -138,11 +141,11 @@ function endGame() {
 function animate() {
   requestAnimationFrame(animate);
   checkCollisions();
-  const carArray = Object.values(cars);
-  carArray.forEach((car) => {
-    const carPos = car.model.position; // Fix the access to position property
-    car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); // Fix the setting of position
-  });
+//   const carArray = Object.values(cars);
+//   carArray.forEach((car) => {
+//     const carPos = car.model.position; 
+//     car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); 
+//   });
   renderer.render(scene, camera);
 }
 

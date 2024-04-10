@@ -9,8 +9,9 @@ export function generateRandomPosition(min, max) {
 export function createLane(laneType, zPosition, models, scene) {
     const lane = {
         type: laneType,
+        direction: generateRandomPosition(0, 1) ? 'left' : 'right',
         entities: [],
-    }; 
+    };
     if (laneType === "field") {
         const grass = new Entity("grass", models, 0, -0.4, zPosition);
         scene.add(grass.model);
@@ -27,41 +28,38 @@ export function createLane(laneType, zPosition, models, scene) {
             }
         }
 
-    } else {
+    } else if (laneType === 'road') {
         const stripe_road = new Entity("stripe_road", models, 0, -0.4, zPosition);
         scene.add(stripe_road.model);
         lane.entities.push(stripe_road);
 
-        const numCars = generateRandomPosition(1, 3);
-        for (let i = 0; i < numCars; i++) {
-            const carXPosition = generateRandomPosition(-laneWidth / 2 + 1, laneWidth / 2 - 1);
-            const carZPosition = zPosition;
-            const orange_car = new Entity("orange_car", models, carXPosition, -0.2, carZPosition);
-            orange_car.model.rotateY(Math.PI / 2);
-            cars.push(orange_car);
-            scene.add(orange_car.model);
-        }
+        cars = generateCars(models, scene, zPosition)
+    } else {
+        const railroad = new Entity("railroad", models, 0, -0.4, zPosition);
+        scene.add(railroad.model);
+        lane.entities.push(railroad);
     }
- 
-    return lane;
+
+    return { lane, cars };
 }
 
 export function generateLanes(models, scene) {
-    lanes = [];
     let zPosition = 0;
     for (let i = -9; i <= 15; i++) {
-        const laneType = i <= 0 || i == 1 ? 'field' : generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
+        let randomNumber = generateRandomPosition(1, 10)
+        const laneType = i <= 0 || i == 1 ? 'field' : randomNumber >= 1 && randomNumber <= 4 ? 'field' : randomNumber >= 5 && randomNumber <= 8 ? 'road' : 'railroad';
         const lane = createLane(laneType, i, models, scene);
-        lanes.push(lane);
+        lanes.push(lane.lane);
         zPosition += 1;
     }
+    return { lanes, cars }
 }
-export function generateCars(numCars, models, scene) {
+export function generateCars(models, scene, zPosition) {
+    const numCars = generateRandomPosition(1, 3);
     for (let i = 0; i < numCars; i++) {
-        const laneIndex = generateRandomPosition(0, lanes.length - 1);
-        const carZPosition = lanes[laneIndex].zPosition - 0.7;
-        const carXPosition = generateRandomPosition(-laneWidth / 2 + 0.5, laneWidth / 2 - 0.5);
-        const orange_car = new Entity("orange_car", models, carXPosition, -0.5, carZPosition);
+        const carXPosition = generateRandomPosition(-laneWidth / 2 + 1, laneWidth / 2 - 1);
+        const carZPosition = zPosition;
+        const orange_car = new Entity("police_car", models, carXPosition, -0.2, carZPosition);
         orange_car.model.rotateY(Math.PI / 2);
         cars.push(orange_car);
         scene.add(orange_car.model);
