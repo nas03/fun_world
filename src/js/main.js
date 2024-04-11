@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
 import { loadAllModels } from './loadModelFromDish.js';
 import { Player } from './entities/player.js';
-import { generateLanes, generateCars } from './generateMap.js';
+import { generateLanes, generateCars, animateVehicle } from './generateMap.js';
 
 const maxScore = document.getElementById('maxScore');
 
@@ -46,21 +46,21 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
 const modelPaths = [
-    { path: ['../assets/models/characters/chicken/0.obj', '../assets/models/characters/chicken/0.png'], type: ["chicken", "player"] },
-    { path: ['../assets/models/characters/bacon/bacon.obj', '../assets/models/characters/bacon/bacon.png'], type: ["bacon", "player"] },
-    { path: ['../assets/models/environment/grass/model.obj', '../assets/models/environment/grass/light-grass.png'], type: ["grass", "land"] },
-    { path: ['../assets/models/environment/tree/0/0.obj', '../assets/models/environment/tree/0/0.png'], type: ["tree0", "tree"] },
-    { path: ['../assets/models/environment/tree/1/0.obj', '../assets/models/environment/tree/1/0.png'], type: ["tree1", "tree"] },
-    { path: ['../assets/models/environment/tree/2/0.obj', '../assets/models/environment/tree/2/0.png'], type: ["tree2", "tree"] },
-    { path: ['../assets/models/environment/tree/3/0.obj', '../assets/models/environment/tree/3/0.png'], type: ["tree3", "tree"] },
-    { path: ['../assets/models/environment/road/model.obj', "../assets/models/environment/road/blank-texture.png"], type: ["blank_road", "road"] },
-    { path: ['../assets/models/environment/road/model.obj', "../assets/models/environment/road/stripes-texture.png"], type: ["stripe_road", "road"] },
-    { path: ['../assets/models/environment/railroad/0.obj', "../assets/models/environment/railroad/0.png"], type: ["railroad", "road"] },
-    { path: ['../assets/models/vehicles/orange_car/0.obj', '../assets/models/vehicles/orange_car/0.png'], type: ["orange_car", "car"] },
-    { path: ['../assets/models/vehicles/blue_truck/0.obj', '../assets/models/vehicles/blue_truck/0.png'], type: ["blue_truck", "car"] },
-    { path: ['../assets/models/vehicles/blue_car/0.obj', '../assets/models/vehicles/blue_car/0.png'], type: ["blue_car", "car"] },
-    { path: ['../assets/models/vehicles/green_car/0.obj', '../assets/models/vehicles/green_car/0.png'], type: ["green_car", "car"] },
-    { path: ['../assets/models/vehicles/police_car/0.obj', '../assets/models/vehicles/police_car/0.png'], type: ["police_car", "car"] },
+  { path: ['../assets/models/characters/chicken/0.obj', '../assets/models/characters/chicken/0.png'], type: ["chicken", "player"] },
+  { path: ['../assets/models/characters/bacon/bacon.obj', '../assets/models/characters/bacon/bacon.png'], type: ["bacon", "player"] },
+  { path: ['../assets/models/environment/grass/model.obj', '../assets/models/environment/grass/light-grass.png'], type: ["grass", "land"] },
+  { path: ['../assets/models/environment/tree/0/0.obj', '../assets/models/environment/tree/0/0.png'], type: ["tree0", "tree"] },
+  { path: ['../assets/models/environment/tree/1/0.obj', '../assets/models/environment/tree/1/0.png'], type: ["tree1", "tree"] },
+  { path: ['../assets/models/environment/tree/2/0.obj', '../assets/models/environment/tree/2/0.png'], type: ["tree2", "tree"] },
+  { path: ['../assets/models/environment/tree/3/0.obj', '../assets/models/environment/tree/3/0.png'], type: ["tree3", "tree"] },
+  { path: ['../assets/models/environment/road/model.obj', "../assets/models/environment/road/blank-texture.png"], type: ["blank_road", "road"] },
+  { path: ['../assets/models/environment/road/model.obj', "../assets/models/environment/road/stripes-texture.png"], type: ["stripe_road", "road"] },
+  { path: ['../assets/models/environment/railroad/0.obj', "../assets/models/environment/railroad/0.png"], type: ["railroad", "road"] },
+  { path: ['../assets/models/vehicles/orange_car/0.obj', '../assets/models/vehicles/orange_car/0.png'], type: ["orange_car", "car"] },
+  { path: ['../assets/models/vehicles/blue_truck/0.obj', '../assets/models/vehicles/blue_truck/0.png'], type: ["blue_truck", "car"] },
+  { path: ['../assets/models/vehicles/blue_car/0.obj', '../assets/models/vehicles/blue_car/0.png'], type: ["blue_car", "car"] },
+  { path: ['../assets/models/vehicles/green_car/0.obj', '../assets/models/vehicles/green_car/0.png'], type: ["green_car", "car"] },
+  { path: ['../assets/models/vehicles/police_car/0.obj', '../assets/models/vehicles/police_car/0.png'], type: ["police_car", "car"] },
 ];
 
 loadAllModels(modelPaths)
@@ -72,11 +72,11 @@ loadAllModels(modelPaths)
   });
 
 const initGame = () => {
-    if (!localStorage.getItem("maxScoreFunWorld")) {
-        localStorage.setItem("maxScoreFunWorld", 0);
-      }
-      
-      maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld")
+  if (!localStorage.getItem("maxScoreFunWorld")) {
+    localStorage.setItem("maxScoreFunWorld", 0);
+  }
+
+  maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld")
 };
 
 initGame();
@@ -86,25 +86,25 @@ function playGame(models) {
     console.error("models null at main");
   }
 
-    player = new Player("chicken", models, 0, 0, 0, camera);
+  player = new Player("chicken", models, 0, 0, 0, camera);
 
-    const boundingBox = new THREE.Box3().setFromObject(player.model);
-    const center = new THREE.Vector3();
-    boundingBox.getCenter(center);
+  const boundingBox = new THREE.Box3().setFromObject(player.model);
+  const center = new THREE.Vector3();
+  boundingBox.getCenter(center);
 
-    camera.position.set(center.x + 3, center.y + 10, center.z - 6)
-    camera.lookAt(center)
+  camera.position.set(center.x + 3, center.y + 10, center.z - 6)
+  camera.lookAt(center)
 
-    scene.add(player.model);
+  scene.add(player.model);
 
-    cars = generateLanes(models, scene).cars;
-   
-    player.play(models, scene)
+  cars = generateLanes(models, scene).cars;
+
+  player.play(models, scene)
 }
 
 orbit.update();
 
-const collisionThreshold = 1; 
+const collisionThreshold = 1;
 
 function checkCollisions() {
   for (let i = 0; i < cars.length; i++) {
@@ -141,11 +141,19 @@ function endGame() {
 function animate() {
   requestAnimationFrame(animate);
   checkCollisions();
-//   const carArray = Object.values(cars);
-//   carArray.forEach((car) => {
-//     const carPos = car.model.position; 
-//     car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); 
-//   });
+  //   const carArray = Object.values(cars);
+  //   carArray.forEach((car) => {
+  //     const carPos = car.model.position; 
+  //     car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); 
+  //   });
+  loadAllModels(modelPaths)
+  .then((models) => {
+    animateVehicle(models, scene)
+  })
+  .catch((error) => {
+    console.error("Lỗi khi load model:", error);
+  });
+  
   renderer.render(scene, camera);
 }
 
