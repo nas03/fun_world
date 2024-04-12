@@ -11,7 +11,7 @@ export class Player extends Entity {
 
     play(models, scene) {
         const movementDistance = 1;
-        let pressedKey = false;
+        let pressedKey = false; 
 
         // Event listener for keydown
         document.addEventListener('keydown', (event) => {
@@ -98,7 +98,7 @@ export class Player extends Entity {
             // Reset player position to ground level
             this.model.position.y = this.jumpStartPosY;
             this.posX = Math.max(-10, Math.min(10, this.targetX));
-            this.posZ = Math.max(-10, Math.min(10, this.targetZ));
+            this.posZ = this.targetZ;
         }
     }
 }
