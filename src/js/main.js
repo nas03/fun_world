@@ -105,20 +105,30 @@ function checkCollisions() {
         }
     }
 
-    /*const trees = [tree0, tree1, tree2, tree3];
-    for (let i = 0; i < trees.length; i++) {
-        const tree = trees[i];
-        const treePosition = tree.model.position;
-        const distanceToTree = player.model.position.distanceTo(treePosition);
-        // Nếu khoảng cách nhỏ hơn ngưỡng va chạm với cây, xem như có va chạm
-        if (distanceToTree < collisionThreshold) {
-            // Lưu lại vị trí hợp lệ trước đó của người chơi
-            player.lastValidPosition.copy(player.model.position);
-            // Thiết lập lại vị trí của người chơi để ngăn chúng đi qua cây
-            player.setPosition(player.lastValidPosition.x, player.lastValidPosition.y, player.lastValidPosition.z);
-            return;
+    // Kiểm tra va chạm với các cây
+    for (let i = 0; i < lanes.length; i++) {
+        const lane = lanes[i];
+        if (lane.type === "field") {
+            const entities = lane.entities;
+            for (let j = 0; j < entities.length; j++) {
+                const entity = entities[j];
+                if (entity.type.includes("tree")) { // Kiểm tra xem entity có phải là cây không
+                    const treePosition = entity.model.position;
+                    const distanceToTree = player.model.position.distanceTo(treePosition);
+                    // Nếu khoảng cách nhỏ hơn ngưỡng va chạm với cây, xem như có va chạm
+                    if (distanceToTree < collisionThreshold) {
+                        // Xử lý va chạm với cây
+                        // Ví dụ: Thiết lập lại vị trí của người chơi để ngăn chúng đi qua cây
+                        const playerPosition = player.model.position.clone(); // Clone vị trí hiện tại của người chơi
+                        const directionToTree = treePosition.clone().sub(playerPosition).normalize(); // Vector hướng từ người chơi đến cây
+                        const newPosition = treePosition.clone().sub(directionToTree.multiplyScalar(collisionThreshold)); // Vị trí mới của người chơi trước cây
+                        player.model.position.copy(newPosition); // Cập nhật vị trí của người chơi
+                        return; // Dừng kiểm tra va chạm với cây
+                    }
+                }
+            }
         }
-    }*/
+    }
 }
 
 function endGame() {

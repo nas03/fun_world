@@ -10,7 +10,7 @@ export function createLane(laneType, zPosition, models, scene) {
     const lane = {
         type: laneType,
         entities: [],
-    };
+    }; 
     if (laneType === "field") {
         const grass = new Entity("grass", models, 0, -0.4, zPosition);
         scene.add(grass.model);
@@ -35,14 +35,14 @@ export function createLane(laneType, zPosition, models, scene) {
         const numCars = generateRandomPosition(1, 3);
         for (let i = 0; i < numCars; i++) {
             const carXPosition = generateRandomPosition(-laneWidth / 2 + 1, laneWidth / 2 - 1);
-            const carZPosition = zPosition - 0.5;
-            const orange_car = new Entity("orange_car", models, carXPosition, 0.2, carZPosition);
+            const carZPosition = zPosition;
+            const orange_car = new Entity("orange_car", models, carXPosition, -0.2, carZPosition);
             orange_car.model.rotateY(Math.PI / 2);
             cars.push(orange_car);
             scene.add(orange_car.model);
         }
     }
-
+ 
     return lane;
 }
 
@@ -59,9 +59,9 @@ export function generateLanes(models, scene) {
 export function generateCars(numCars, models, scene) {
     for (let i = 0; i < numCars; i++) {
         const laneIndex = generateRandomPosition(0, lanes.length - 1);
-        const carZPosition = lanes[laneIndex].zPosition - 0.5;
+        const carZPosition = lanes[laneIndex].zPosition - 0.7;
         const carXPosition = generateRandomPosition(-laneWidth / 2 + 0.5, laneWidth / 2 - 0.5);
-        const orange_car = new Entity("orange_car", models, carXPosition, 0.2, carZPosition);
+        const orange_car = new Entity("orange_car", models, carXPosition, -0.5, carZPosition);
         orange_car.model.rotateY(Math.PI / 2);
         cars.push(orange_car);
         scene.add(orange_car.model);
