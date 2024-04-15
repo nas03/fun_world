@@ -145,11 +145,6 @@ function endGame() {
 function animate() {
   requestAnimationFrame(animate);
   checkCollisions();
-  //   const carArray = Object.values(cars);
-  //   carArray.forEach((car) => {
-  //     const carPos = car.model.position; 
-  //     car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); 
-  //   });
 
   if(m) {
     animateVehicle(m);
