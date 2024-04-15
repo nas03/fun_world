@@ -1,10 +1,12 @@
 import { Entity } from "./entity";
 import * as THREE from "three";
-import { generateRandomPosition, createLane, deleteLane } from '../generateMap.js'
-import { playSfx } from "../playSound.js";
+import { generateRandomPosition, createLane, deleteLane } from '../utilities/generateMap.js'
+import { playSfx } from "../utilities/playSound.js";
+
 const counterDOM = document.getElementById('counter');
 const maxScore = document.getElementById('maxScore');
 const currentMaxScore = localStorage.getItem('maxScoreFunWorld')
+
 export class Player extends Entity {
   constructor(type, models, x, y, z, camera) {
     super(type, models, x, y, z);

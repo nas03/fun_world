@@ -1,5 +1,5 @@
-import { Car } from './entities/car.js';
-import { Entity } from './entities/entity.js';
+import { Car } from '../entities/car.js';
+import { Entity } from '../entities/entity.js';
 
 const laneWidth = 11;
 let lanes = [];

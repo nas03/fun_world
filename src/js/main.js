@@ -1,18 +1,17 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
-import { loadAllModels } from './loadModelFromDish.js';
+import { loadAllModels } from './utilities/loadModelFromDish.js';
 import { Player } from './entities/player.js';
-import { generateLanes, animateVehicle } from './generateMap.js';
-import { playMusic } from './playSound.js';
+import { generateLanes, animateVehicle } from './utilities/generateMap.js';
+import { playMusic } from './utilities/playSound.js';
 
 const maxScore = document.getElementById('maxScore');
 
 let cars = [];
 let player;
 
-let scene;
 //Camera
-const gameScene = new THREE.Scene();
+const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   45,
   window.innerWidth / window.innerHeight,
@@ -42,10 +41,10 @@ directionalLight.shadow.camera.left = -15; // Điểm bắt đầu bên trái c�
 directionalLight.shadow.camera.right = 15; // Điểm kết thúc bên phải của phạm vi camera
 directionalLight.shadow.camera.top = 15; // Điểm kết thúc phía trên của phạm vi camera
 directionalLight.shadow.camera.bottom = -15; // Điểm bắt đầu phía dưới của phạm vi camera
-gameScene.add(directionalLight);
+scene.add(directionalLight);
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-gameScene.add(ambientLight); 
+scene.add(ambientLight); 
 
 const modelPaths = [
   { path: ['../assets/models/characters/chicken/0.obj', '../assets/models/characters/chicken/0.png'], type: ["chicken", "player"] },
@@ -65,17 +64,10 @@ const modelPaths = [
   { path: ['../assets/models/vehicles/police_car/0.obj', '../assets/models/vehicles/police_car/0.png'], type: ["police_car", "car"] },
 ];
 
-let m;
-
-loadAllModels(modelPaths)
-  .then((models) => {
-    m = models;
-    console.log(m);
-    playGame(models);
-  })
+const models = await loadAllModels(modelPaths)
   .catch((error) => {
     console.error("Lỗi khi load model:", error);
-  });
+});
 
 const initGame = () => {
   if (!localStorage.getItem("maxScoreFunWorld")) {
@@ -83,18 +75,22 @@ const initGame = () => {
   }
 
   maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld");
-  
-  const startScene = new THREE.Scene();
-  scene = startScene;
-  document.addEventListener('click', () => {
+
+  const startButton = document.querySelector("#start");
+  const title = document.querySelector('#title');
+  startButton.addEventListener('click', () => {
+    startButton.remove();
+    title.remove();
     playMusic();
-    scene = gameScene;
+    player.play(models, scene);
   });
+  
+  playGame();
 };
 
 initGame();
 
-function playGame(models) {
+function playGame() {
   if (models === null || models === undefined) {
     console.error("models null at main");
   }
@@ -108,11 +104,9 @@ function playGame(models) {
   camera.position.set(center.x + 3, center.y + 10, center.z - 6)
   camera.lookAt(center)
 
-  gameScene.add(player.model);
+  scene.add(player.model);
 
-  cars = generateLanes(models, gameScene).cars;
-
-  player.play(models, gameScene)
+  cars = generateLanes(models, scene).cars;
 }
 
 orbit.update();
@@ -155,8 +149,8 @@ function animate() {
   requestAnimationFrame(animate);
   checkCollisions();
 
-  if(m) {
-    animateVehicle(m);
+  if(models) {
+    animateVehicle(models);
   } 
 
   renderer.render(scene, camera);
