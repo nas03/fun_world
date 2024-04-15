@@ -4,13 +4,16 @@ export class Entity {
         this.model = null; // Initialize model as null
         if (models === null || models === undefined)
             console.error("models null");
-        models.forEach(m => {
+        for (const i in models) {
+            const m = models[i];
             if (m.type === type && m.model) {
                 this.model = m.model.clone();
-            } else {
-                console.error("model not und");
-            }
-        });
+                break;
+            } 
+        }
+        if(!this.model){
+            console.error("model " + type + " not und");
+        }
         // Check if model is not null before setting position
         this.setPosition(x, y, z);
     }
@@ -23,7 +26,7 @@ export class Entity {
         if (this.model) {
             this.model.position.set(this.posX, this.posY, this.posZ);
         } else {
-            console.error("loi model");
+            console.error("loi model " + type);
         }
     }
 

@@ -43,7 +43,7 @@ directionalLight.shadow.camera.bottom = -15; // Điểm bắt đầu phía dư�
 scene.add(directionalLight);
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-scene.add(ambientLight);
+scene.add(ambientLight); 
 
 const modelPaths = [
   { path: ['../assets/models/characters/chicken/0.obj', '../assets/models/characters/chicken/0.png'], type: ["chicken", "player"] },
@@ -63,8 +63,12 @@ const modelPaths = [
   { path: ['../assets/models/vehicles/police_car/0.obj', '../assets/models/vehicles/police_car/0.png'], type: ["police_car", "car"] },
 ];
 
+let m;
+
 loadAllModels(modelPaths)
   .then((models) => {
+    m = models;
+    console.log(m);
     playGame(models);
   })
   .catch((error) => {
@@ -146,14 +150,11 @@ function animate() {
   //     const carPos = car.model.position; 
   //     car.model.position.set(carPos.x + 0.05, carPos.y, carPos.z); 
   //   });
-  loadAllModels(modelPaths)
-  .then((models) => {
-    animateVehicle(models, scene)
-  })
-  .catch((error) => {
-    console.error("Lỗi khi load model:", error);
-  });
-  
+
+  if(m) {
+    animateVehicle(m);
+  } 
+
   renderer.render(scene, camera);
 }
 

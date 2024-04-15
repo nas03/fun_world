@@ -1,3 +1,5 @@
+import { Vector3 } from 'three';
+import { Car } from './entities/car.js';
 import { Entity } from './entities/entity.js';
 
 const laneWidth = 11;
@@ -61,7 +63,7 @@ export function generateCars(models, scene, zPosition, direction) {
     for (let i = 0; i < numCars; i++) {
         const carXPosition = direction === "left" ? laneWidth : -laneWidth;
         const carZPosition = zPosition;
-        const vehicle = new Entity("police_car", models, carXPosition, -0.2, carZPosition);
+        const vehicle = new Car(models, carXPosition, -0.2, carZPosition, direction);
         vehicle.model.rotateY(direction === "left" ? -Math.PI / 2 : Math.PI / 2);
         cars.push(vehicle);
         scene.add(vehicle.model);
@@ -84,25 +86,19 @@ export function deleteLane(scene) {
     }
 }
 export function animateVehicle(models, scene) {
-    for (const lane of lanes) {
-        if (lane.type === "road") {
-          if (lane.entities.length === 0) {
-            lane.entities = generateCars(models, scene, lane.zPosition, lane.direction);
-          }
-    
-          for (const car of lane.entities) {
-            console.log(car)
-            // const carPos = car[0].model.position;
-            const speed = lane.direction === "left" ? -0.05 : 0.05; // Adjust speed based on direction
-            car.model.position.set(car.posX + speed, car.posY, car.posZ);
-    
-            // Check for car going out of bounds (optional)
-            if (Math.abs(car.posX) > laneWidth) {
-              // Remove car from scene and lane.cars if it goes out of bounds
-              scene.remove(car.model);
-              lane.entities.splice(lane.cars.indexOf(car), 1);
-            }
-          }
-        }
+    const carArray = Object.values(cars);
+    carArray.forEach((car) => {
+      const carPos = car.model.position; 
+      const direction = car.direction === "left" ? -1 : 1;
+      const temp = (carPos.x + 0.05 * direction);
+      console.log(Math.round(Math.abs(temp)));
+      if(Math.round(temp) == laneWidth * direction) {
+        console.log("quay dau de");
+        car.direction =( direction == -1 ? "right" : "left");
+        car.model.rotateY(Math.PI);
+        console.log(car.direction)
       }
+
+      car.model.position.set(temp, carPos.y, carPos.z); 
+    });
 }
