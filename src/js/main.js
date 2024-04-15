@@ -69,7 +69,17 @@ const models = await loadAllModels(modelPaths)
     console.error("Lỗi khi load model:", error);
 });
 
+function onResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+}
+
 const initGame = () => {
+  window.addEventListener("resize", onResize);
+
   if (!localStorage.getItem("maxScoreFunWorld")) {
     localStorage.setItem("maxScoreFunWorld", 0);
   }
