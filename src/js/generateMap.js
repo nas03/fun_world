@@ -59,20 +59,23 @@ export function generateLanes(models, scene) {
     return { lanes, cars }
 }
 export function generateCars(models, scene, zPosition, direction) {
-    // const numCars = generateRandomPosition(1, 3);
-    // for (let i = 0; i < numCars; i++) {
-    const carXPosition = direction === "left" ? laneWidth : -laneWidth;
-    const carZPosition = zPosition;
-    const vehicle = new Car(
-        models,
-        getCarType(generateRandomPosition(1, 10)),
-        carXPosition, -0.2, carZPosition, direction
-    );
-    vehicle.model.rotateY(direction === "left" ? -Math.PI / 2 : Math.PI / 2);
-    cars.push(vehicle);
-    scene.add(vehicle.model);
-    // }
-    return vehicle;
+    let car_entities = []
+    const numCars = generateRandomPosition(1, 3);
+    for (let i = 0; i < numCars; i++) {
+        let carXPosition = direction === "left" ? laneWidth : -laneWidth;
+        const carZPosition = zPosition;
+        const carType = getCarType(generateRandomPosition(1, 10))
+        const vehicle = new Car(
+            models,
+            carType,
+            carXPosition, -0.2, carZPosition, direction
+        );
+        vehicle.model.rotateY(direction === "left" ? -Math.PI / 2 : Math.PI / 2);
+        cars.push(vehicle);
+        car_entities.push(vehicle)
+        scene.add(vehicle.model);
+    }
+    return car_entities;
 }
 function getCarType(randomNumber) {
     switch (randomNumber) {
@@ -108,16 +111,23 @@ export function deleteLane(scene) {
     }
 }
 export function animateVehicle() {
-    const carArray = Object.values(cars);
-    carArray.forEach((car) => {
-        const carPos = car.model.position;
-        const direction = car.direction === "left" ? -1 : 1;
-        const temp = (carPos.x + 0.05 * direction);
-        if (Math.round(temp) == laneWidth * direction) {
-            car.direction = (direction == -1 ? "right" : "left");
-            car.model.rotateY(Math.PI);
-        }
+    lanes.forEach((lane) => {
+        if (lane.type === "road") {
+            const carArray = Object.values(lane.entities)
+            carArray[0].forEach((car, index) => {
+                setTimeout(() => {
+                    const carPos = car.model.position;
+                    const direction = car.direction === "left" ? -1 : 1;
+                    const temp = (carPos.x + 0.05 * direction);
 
-        car.model.position.set(temp, carPos.y, carPos.z);
-    });
+                    if (Math.round(temp) == laneWidth * direction) {
+                        car.direction = (direction === -1 ? "right" : "left");
+                        car.model.rotateY(Math.PI);
+                    }
+                    car.model.position.set(temp, carPos.y, carPos.z);
+                }, index * 1000);
+            });
+        }
+    })
+
 }
