@@ -1,6 +1,7 @@
 import { Entity } from "./entity";
-import { Vector3 } from "three";
+import * as THREE from "three";
 import { generateRandomPosition, createLane, deleteLane } from '../generateMap.js'
+import { playSfx } from "../playSound.js";
 const counterDOM = document.getElementById('counter');
 const maxScore = document.getElementById('maxScore');
 const currentMaxScore = localStorage.getItem('maxScoreFunWorld')
@@ -35,10 +36,12 @@ export class Player extends Entity {
               deltaX = +movementDistance; // sang trai
               this.jump();
               break;
+
             case "ArrowRight":
               deltaX = -movementDistance; //phai
               this.jump();
               break;
+
             case "ArrowDown":
               if (this.targetZ != 0) {
                 deltaZ = -movementDistance;// xuong
@@ -46,7 +49,8 @@ export class Player extends Entity {
                 // deleteLane(scene)
               }
               break;
-            case "ArrowUp":
+
+            case "ArrowUp": {
               deltaZ = +movementDistance; // len
               this.jump();
               this.targetZ = this.posZ + deltaZ;
@@ -65,7 +69,13 @@ export class Player extends Entity {
               }
               counterDOM.innerText = this.ScoreNow;
               break;
+            }
+
+            default:
+              return;
           }
+
+          playSfx("jump");
 
           this.targetX = this.posX + deltaX;
           this.targetZ = this.posZ + deltaZ;
@@ -73,7 +83,7 @@ export class Player extends Entity {
           this.setPosition(this.posX, 0, this.posZ);
           this.model.lookAt(this.targetX, 0, this.targetZ);
 
-          const cameraOffset = new Vector3(deltaX, 0, deltaZ);
+          const cameraOffset = new THREE.Vector3(deltaX, 0, deltaZ);
           this.camera.position.add(cameraOffset);
           this.camera.position.x = Math.max(-10, Math.min(10, this.camera.position.x));
           this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));

@@ -2,15 +2,17 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Add '.js' extension
 import { loadAllModels } from './loadModelFromDish.js';
 import { Player } from './entities/player.js';
-import { generateLanes, generateCars, animateVehicle } from './generateMap.js';
+import { generateLanes, animateVehicle } from './generateMap.js';
+import { playMusic } from './playSound.js';
 
 const maxScore = document.getElementById('maxScore');
 
 let cars = [];
-var player;
+let player;
 
+let scene;
 //Camera
-const scene = new THREE.Scene();
+const gameScene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   45,
   window.innerWidth / window.innerHeight,
@@ -40,10 +42,10 @@ directionalLight.shadow.camera.left = -15; // Điểm bắt đầu bên trái c�
 directionalLight.shadow.camera.right = 15; // Điểm kết thúc bên phải của phạm vi camera
 directionalLight.shadow.camera.top = 15; // Điểm kết thúc phía trên của phạm vi camera
 directionalLight.shadow.camera.bottom = -15; // Điểm bắt đầu phía dưới của phạm vi camera
-scene.add(directionalLight);
+gameScene.add(directionalLight);
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-scene.add(ambientLight); 
+gameScene.add(ambientLight); 
 
 const modelPaths = [
   { path: ['../assets/models/characters/chicken/0.obj', '../assets/models/characters/chicken/0.png'], type: ["chicken", "player"] },
@@ -80,7 +82,14 @@ const initGame = () => {
     localStorage.setItem("maxScoreFunWorld", 0);
   }
 
-  maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld")
+  maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld");
+  
+  const startScene = new THREE.Scene();
+  scene = startScene;
+  document.addEventListener('click', () => {
+    playMusic();
+    scene = gameScene;
+  });
 };
 
 initGame();
@@ -99,11 +108,11 @@ function playGame(models) {
   camera.position.set(center.x + 3, center.y + 10, center.z - 6)
   camera.lookAt(center)
 
-  scene.add(player.model);
+  gameScene.add(player.model);
 
-  cars = generateLanes(models, scene).cars;
+  cars = generateLanes(models, gameScene).cars;
 
-  player.play(models, scene)
+  player.play(models, gameScene)
 }
 
 orbit.update();

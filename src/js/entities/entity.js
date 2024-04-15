@@ -3,7 +3,7 @@ export class Entity {
         this.type = type;
         this.model = null; // Initialize model as null
         if (models === null || models === undefined)
-            console.error("models null");
+            console.error("models not found");
         for (const i in models) {
             const m = models[i];
             if (m.type === type && m.model) {
@@ -12,7 +12,7 @@ export class Entity {
             } 
         }
         if(!this.model){
-            console.error("model " + type + " not und");
+            console.error("model " + type + " not found");
         }
         // Check if model is not null before setting position
         this.setPosition(x, y, z);
@@ -26,7 +26,7 @@ export class Entity {
         if (this.model) {
             this.model.position.set(this.posX, this.posY, this.posZ);
         } else {
-            console.error("loi model " + type);
+            console.error("Model not found");
         }
     }
 

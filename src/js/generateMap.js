@@ -1,4 +1,3 @@
-import { Vector3 } from 'three';
 import { Car } from './entities/car.js';
 import { Entity } from './entities/entity.js';
 
