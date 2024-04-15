@@ -1,3 +1,5 @@
+import { Vector3 } from 'three';
+import { Car } from './entities/car.js';
 import { Entity } from './entities/entity.js';
 
 const laneWidth = 11;
@@ -33,13 +35,13 @@ export function createLane(laneType, direction, zPosition, models, scene) {
         const stripe_road = new Entity("stripe_road", models, 0, -0.4, zPosition);
         scene.add(stripe_road.model);
 
-        cars = generateCars(models, scene, zPosition, direction);
-        lane.entities.push(cars)
+        let car_entities = generateCars(models, scene, zPosition, direction);
+        lane.entities.push(car_entities)
     } else {
         const railroad = new Entity("railroad", models, 0, -0.4, zPosition);
         scene.add(railroad.model);
     }
-    console.log(lanes)
+    console.log(lanes, cars)
     return { lane, cars };
 }
 
@@ -57,16 +59,41 @@ export function generateLanes(models, scene) {
     return { lanes, cars }
 }
 export function generateCars(models, scene, zPosition, direction) {
+    let car_entities = []
     const numCars = generateRandomPosition(1, 3);
     for (let i = 0; i < numCars; i++) {
-        const carXPosition = direction === "left" ? laneWidth : -laneWidth;
+        let carXPosition = direction === "left" ? laneWidth : -laneWidth;
         const carZPosition = zPosition;
-        const vehicle = new Entity("police_car", models, carXPosition, -0.2, carZPosition);
+        const carType = getCarType(generateRandomPosition(1, 10))
+        const vehicle = new Car(
+            models,
+            carType,
+            carXPosition, -0.2, carZPosition, direction
+        );
         vehicle.model.rotateY(direction === "left" ? -Math.PI / 2 : Math.PI / 2);
         cars.push(vehicle);
+        car_entities.push(vehicle)
         scene.add(vehicle.model);
     }
-    return cars;
+    return car_entities;
+}
+function getCarType(randomNumber) {
+    switch (randomNumber) {
+        case 1:
+        case 2:
+            return 'orange_car';
+        case 3:
+        case 4:
+            return 'blue_truck';
+        case 5:
+        case 6:
+            return 'blue_car';
+        case 7:
+        case 8:
+            return 'green_car';
+        default:
+            return 'police_car';
+    }
 }
 export function deleteLane(scene) {
     if (lanes.length !== -1) {
@@ -83,26 +110,24 @@ export function deleteLane(scene) {
         console.warn(`Lane at zPosition not found.`);
     }
 }
-export function animateVehicle(models, scene) {
-    for (const lane of lanes) {
+export function animateVehicle() {
+    lanes.forEach((lane) => {
         if (lane.type === "road") {
-          if (lane.entities.length === 0) {
-            lane.entities = generateCars(models, scene, lane.zPosition, lane.direction);
-          }
-    
-          for (const car of lane.entities) {
-            console.log(car)
-            // const carPos = car[0].model.position;
-            const speed = lane.direction === "left" ? -0.05 : 0.05; // Adjust speed based on direction
-            car.model.position.set(car.posX + speed, car.posY, car.posZ);
-    
-            // Check for car going out of bounds (optional)
-            if (Math.abs(car.posX) > laneWidth) {
-              // Remove car from scene and lane.cars if it goes out of bounds
-              scene.remove(car.model);
-              lane.entities.splice(lane.cars.indexOf(car), 1);
-            }
-          }
+            const carArray = Object.values(lane.entities)
+            carArray[0].forEach((car, index) => {
+                setTimeout(() => {
+                    const carPos = car.model.position;
+                    const direction = car.direction === "left" ? -1 : 1;
+                    const temp = (carPos.x + 0.05 * direction);
+
+                    if (Math.round(temp) == laneWidth * direction) {
+                        car.direction = (direction === -1 ? "right" : "left");
+                        car.model.rotateY(Math.PI);
+                    }
+                    car.model.position.set(temp, carPos.y, carPos.z);
+                }, index * 1000);
+            });
         }
-      }
+    })
+
 }
