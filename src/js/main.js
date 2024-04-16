@@ -122,7 +122,7 @@ function checkCollisions() {
     const carPosition = car.model.position;
     const distance = player.model.position.distanceTo(carPosition);
     if (distance < collisionThreshold) {
-      endDOM.style.visibility = 'visible';endDOM.style.visibility = 'visible';
+      endDOM.style.visibility = 'visible';
       endGame();
       return;
     }
