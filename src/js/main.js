@@ -72,12 +72,12 @@ loadAllModels(modelPaths)
   .catch((error) => {
     console.error("Lỗi khi load model:", error);
   });
-
+const counterDOM = document.getElementById('counter');
 const initGame = () => {
   if (!localStorage.getItem("maxScoreFunWorld")) {
     localStorage.setItem("maxScoreFunWorld", 0);
   }
-
+  counterDOM.innerText = 0;
   maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld")
 };
 
@@ -179,6 +179,7 @@ function checkCollisions() {
 function endGame() {
   console.log("Game Over");
   player.setPosition(0, 0, 0);
+  initGame();
 }
 
 function animate() {
