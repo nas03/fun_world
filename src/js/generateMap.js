@@ -5,6 +5,7 @@ import { Entity } from './entities/entity.js';
 const laneWidth = 11;
 let lanes = [];
 let cars = []
+
 export function generateRandomPosition(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }

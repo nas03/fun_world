@@ -5,13 +5,28 @@ body {
     color: white;
   }
 
-  #counter {
+#counter {
     position: absolute;
     top: 60px;
     right: 20px;
-  }
-  #maxScore {
+}
+#maxScore {
     position: absolute;
     top: 20px;
     right: 20px;
-  }
+}
+#end {
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+}
+#end button {
+    background-color: red;
+    padding: 20px 50px 20px 50px;
+    font-family: inherit;
+    font-size: inherit;
+}

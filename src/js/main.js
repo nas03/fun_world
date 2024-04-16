@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; //
 import { loadAllModels } from './loadModelFromDish.js';
 import { Player } from './entities/player.js';
 import { generateLanes, generateCars, animateVehicle } from './generateMap.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 const maxScore = document.getElementById('maxScore');
 
@@ -31,7 +32,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const orbit = new OrbitControls(camera, renderer.domElement);
-
+const endDOM = document.getElementById('end');
 //Light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Màu trắng, intensity 1
 directionalLight.position.set(-6, 6, -6);
@@ -101,6 +102,14 @@ function playGame(models) {
   cars = generateLanes(models, scene).cars;
 
   player.play(models, scene)
+  // Xử lý sự kiện nhấp vào nút "Retry"
+  const retryButton = document.getElementById('retry');
+  retryButton.addEventListener('click', () => {
+      lanes.forEach(lane => scene.remove(lane.mesh)); // Xóa các lane khỏi scene
+      // Gọi hàm khởi tạo game lại
+      initGame(); // Đảm bảo rằng hàm initGame đã được định nghĩa ở đâu đó trong mã của bạn
+      endDOM.style.visibility = 'hidden'; // Ẩn phần kết thúc game
+  });
 }
 
 orbit.update();
@@ -113,6 +122,7 @@ function checkCollisions() {
     const carPosition = car.model.position;
     const distance = player.model.position.distanceTo(carPosition);
     if (distance < collisionThreshold) {
+      endDOM.style.visibility = 'visible';endDOM.style.visibility = 'visible';
       endGame();
       return;
     }
