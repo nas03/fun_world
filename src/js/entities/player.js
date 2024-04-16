@@ -1,6 +1,5 @@
 import { Entity } from "./entity";
-import * as THREE from "three";
-import { generateRandomPosition, createLane, deleteLane } from '../utilities/generateMap.js'
+import { generateRandomPosition, createLane } from '../utilities/generateMap.js'
 import { playSfx } from "../utilities/playSound.js";
 
 const counterDOM = document.getElementById('counter');
@@ -8,9 +7,8 @@ const maxScore = document.getElementById('maxScore');
 const currentMaxScore = localStorage.getItem('maxScoreFunWorld')
 
 export class Player extends Entity {
-  constructor(type, models, x, y, z, camera) {
+  constructor(type, models, x, y, z) {
     super(type, models, x, y, z);
-    this.camera = camera;
     this.isJumping = false;
     this.duration = 400; // Thời gian mỗi animation
     this.ScoreNow = 0;
@@ -84,19 +82,6 @@ export class Player extends Entity {
 
           this.setPosition(this.posX, 0, this.posZ);
           this.model.lookAt(this.targetX, 0, this.targetZ);
-
-          const cameraOffset = new THREE.Vector3(deltaX, 0, deltaZ);
-          this.camera.position.add(cameraOffset);
-          this.camera.position.x = Math.max(-10, Math.min(10, this.camera.position.x));
-          this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));
-          this.camera.lookAt(this.model.position);
-
-          // const cameraOffset = new Vector3(deltaX, 0, deltaZ);
-          // this.camera.position.add(cameraOffset);
-          // this.camera.position.x = Math.max(-laneWidth * lanes.length / 2, Math.min(laneWidth * lanes.length / 2, this.camera.position.x));
-          // this.camera.position.z = Math.max(-lanes.length * 2, Math.min(lanes.length * 2, this.camera.position.z));
-
-          // this.camera.lookAt(this.model.position);
         }
       } catch (error) {
         console.log(error)

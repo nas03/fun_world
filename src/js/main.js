@@ -105,14 +105,7 @@ function playGame() {
     console.error("models null at main");
   }
 
-  player = new Player("chicken", models, 0, 0, 0, camera);
-
-  const boundingBox = new THREE.Box3().setFromObject(player.model);
-  const center = new THREE.Vector3();
-  boundingBox.getCenter(center);
-
-  camera.position.set(center.x + 3, center.y + 10, center.z - 6)
-  camera.lookAt(center)
+  player = new Player("chicken", models, 0, 0, 0);
 
   scene.add(player.model);
 
@@ -162,6 +155,13 @@ function animate() {
   if(models) {
     animateVehicle(models);
   } 
+  
+  const boundingBox = new THREE.Box3().setFromObject(player.model);
+  const center = new THREE.Vector3();
+  boundingBox.getCenter(center);
+
+  camera.position.set(center.x + 3, center.y + 10, center.z - 6)
+  camera.lookAt(center)
 
   renderer.render(scene, camera);
 }
