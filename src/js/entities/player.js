@@ -1,7 +1,7 @@
 import { Entity } from "./entity";
-import { generateRandomPosition, createLane } from '../utilities/generateMap.js'
+import { generateRandomPosition } from '../utilities/generateMap.js'
 import { playSfx } from "../utilities/playSound.js";
-
+import { Lane } from "../utilities/generateMap.js"
 const counterDOM = document.getElementById('counter');
 const maxScore = document.getElementById('maxScore');
 const currentMaxScore = localStorage.getItem('maxScoreFunWorld')
@@ -58,7 +58,7 @@ export class Player extends Entity {
               const laneType = generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
               const direction = Math.random() < 0.5 ? 'left' : 'right';
 
-              createLane(laneType, direction, this.targetZ + 13, models, scene)
+              new Lane (laneType, direction, this.targetZ + 13, models, scene)
               this.counter++;
               if (this.counter > this.ScoreNow) {
                 this.ScoreNow = this.counter;
