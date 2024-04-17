@@ -9,6 +9,8 @@ const maxScore = document.getElementById("maxScore");
 const currentMaxScore = localStorage.getItem("maxScoreFunWorld");
 
 export class Player extends Entity {
+  isDead = false;
+
   constructor(type, models, x, y, z) {
     super(type, models, x, y, z);
     this.isJumping = false;
@@ -25,7 +27,7 @@ export class Player extends Entity {
 
     document.addEventListener("keydown", (event) => {
       try {
-        if (!pressedKey) {
+        if (!pressedKey && !this.isDead) {
           pressedKey = true;
           setTimeout(() => {
             pressedKey = false;

@@ -253,13 +253,9 @@ function checkCollisions() {
     }*/
 }
 
-function endGame(event) {
+function endGame() {
   retry.style.display = "block";
-
-  event.preventDefault();
-  document.addEventListener("keydown", function (event) {
-    event.preventDefault();
-  });
+  player.isDead = true;
 }
 
 function animate() {
@@ -283,11 +279,12 @@ function animate() {
 animate();
 
 retryButton.addEventListener("click", function () {
-  var endGameDiv = document.querySelector(".end-game");
+  const endGameDiv = document.querySelector(".end-game");
   endGameDiv.style.display = "none";
   player.setPosition(0, 0, 0);
   camera.position.set(4, 12, -5);
   player.counter = 0;
+  player.isDead = false;
   counterCurrent.innerText = player.counter;
 });
 
