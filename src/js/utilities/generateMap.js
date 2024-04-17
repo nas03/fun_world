@@ -69,7 +69,7 @@ export function generateLanes(models, scene) {
 }
 export function generateCars(models, scene, zPosition, direction) {
     let car_entities = []
-    const numCars = generateRandomPosition(1, 3);
+    const numCars = generateRandomPosition(1, 4);
     for (let i = 0; i < numCars; i++) {
         let carXPosition = direction === "left" ? laneWidth : -laneWidth;
         const carZPosition = zPosition;

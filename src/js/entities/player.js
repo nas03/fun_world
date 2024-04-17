@@ -64,7 +64,7 @@ export class Player extends Entity {
                 generateRandomPosition(0, 2) === 0 ? "field" : "road";
               const direction = Math.random() < 0.5 ? "left" : "right";
 
-              new Lane (laneType, direction, this.targetZ + 13, models, scene)
+              new Lane(laneType, direction, this.targetZ + 13, models, scene)
               this.counter++;
               if (this.counter > this.ScoreNow) {
                 this.ScoreNow = this.counter;
