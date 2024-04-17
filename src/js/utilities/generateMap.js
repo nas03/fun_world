@@ -2,57 +2,46 @@ import { Car } from '../entities/car.js';
 import { Entity } from '../entities/entity.js';
 
 const laneWidth = 11;
-let lanes = []
+let lanes = [];
 let cars = []
-
-export class Lane extends Entity {
-    constructor(type, direction, zPosition, models, scene) {
-        super(type, models, 0, -0.4, zPosition);
-        this._type = type;
-        this.direction = direction;
-        this.zPosition = zPosition;
-        this.entities = [];
-
-        this.createLane(models, scene);
-    }
-    generateRandomPosition(min, max) {
-        return Math.floor(Math.random() * (max - min)) + min;
-    }
-    createLane(models, scene) {
-        const existingLane = lanes.find(lane => lane.zPosition == this.zPosition);
-        if (!existingLane) {
-            if (this.type === "field") {
-                const grass = new Entity("grass", models, 0, -0.4, this.zPosition);
-                scene.add(grass.model);
-                this.entities.push(grass);
-
-                if (this.zPosition !== 0) {
-                    const numTrees = generateRandomPosition(1, 3);
-                    for (let i = 0; i < numTrees; i++) {
-                        const treeType = `tree${generateRandomPosition(0, 3)}`;
-                        const treeX = generateRandomPosition(-laneWidth, laneWidth);
-                        const tree = new Entity(treeType, models, treeX, 0, this.zPosition);
-                        scene.add(tree.model);
-                        this.entities.push(tree);
-                    }
-                }
-            } else if (this.type === 'road') {
-                const stripe_road = new Entity("stripe_road", models, 0, -0.4, this.zPosition);
-                scene.add(stripe_road.model);
-
-                let car_entities = generateCars(models, scene, this.zPosition, this.direction);
-                this.entities.push(car_entities)
-            } else {
-                const railroad = new Entity("railroad", models, 0, -0.4, this.zPosition);
-                scene.add(railroad.model);
-                this.entities.push(railroad);
-            }
-            lanes.push(this)
-        }
-    }
-}
 export function generateRandomPosition(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
+}
+export function createLane(laneType, direction, zPosition, models, scene) {
+    let lane = {
+        type: laneType,
+        direction: direction,
+        zPosition: zPosition,
+        entities: [],
+    };
+    if (laneType === "field") {
+        const grass = new Entity("grass", models, 0, -0.4, zPosition);
+        scene.add(grass.model);
+        lane.entities.push(grass);
+
+        if (zPosition !== 0) {
+            const numTrees = generateRandomPosition(1, 3);
+            for (let i = 0; i < numTrees; i++) {
+                const treeType = `tree${generateRandomPosition(0, 3)}`;
+                const treeX = generateRandomPosition(-laneWidth, laneWidth);
+                const tree = new Entity(treeType, models, treeX, 0, zPosition);
+                scene.add(tree.model);
+                lane.entities.push(tree);
+            }
+        }
+
+    } else if (laneType === 'road') {
+        const stripe_road = new Entity("stripe_road", models, 0, -0.4, zPosition);
+        scene.add(stripe_road.model);
+
+        let car_entities = generateCars(models, scene, zPosition, direction);
+        lane.entities.push(car_entities)
+    } else {
+        const railroad = new Entity("railroad", models, 0, -0.4, zPosition);
+        scene.add(railroad.model);
+    }
+    console.log(lanes, cars)
+    return { lane, cars };
 }
 
 export function generateLanes(models, scene) {
@@ -62,7 +51,8 @@ export function generateLanes(models, scene) {
         const laneType = i <= 0 || i == 1 ? 'field' : randomNumber >= 1 && randomNumber <= 4 ? 'field' : randomNumber >= 5 && randomNumber <= 8 ? 'road' : 'railroad';
         const direction = Math.random() < 0.5 ? 'left' : 'right';
 
-        new Lane(laneType, direction, i, models, scene);
+        const lane = createLane(laneType, direction, i, models, scene);
+        lanes.push(lane.lane);
         zPosition += 1;
     }
     return { lanes, cars }
@@ -102,6 +92,21 @@ function getCarType(randomNumber) {
             return 'green_car';
         default:
             return 'police_car';
+    }
+}
+export function deleteLane(scene) {
+    if (lanes.length !== -1) {
+        const laneToDelete = lanes[lanes.length - 1];
+        console.log(laneToDelete)
+        for (const entity of laneToDelete.entities) {
+            scene.remove(entity.model);
+        }
+
+        // Remove the lane from the lanes array
+        lanes.splice(lanes.length, 1);
+
+    } else {
+        console.warn(`Lane at zPosition not found.`);
     }
 }
 export function animateVehicle() {
