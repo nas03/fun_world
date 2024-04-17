@@ -1,115 +1,180 @@
 import { Entity } from "./entity";
-import { Vector3 } from "three";
-import { generateRandomPosition, createLane } from '../generateMap.js'
-import * as THREE from 'three';
+import {
+  generateLanes,
+  generateRandomPosition,
+} from "../utilities/generateMap.js";
+import { playSfx } from "../utilities/playSound.js";
+import { Lane } from "../utilities/generateMap.js"
+import * as THREE from "three";
+
+const counterDOM = document.getElementById("counter");
+const maxScore = document.getElementById("maxScore");
+const currentMaxScore = localStorage.getItem("maxScoreFunWorld");
 
 export class Player extends Entity {
-    constructor(type, models, x, y, z, camera) {
-        super(type, models, x, y, z);
-        this.camera = camera;
-        this.isJumping = false;
-        this.duration = 400; // Thời gian mỗi animation
-    }
+  constructor(type, models, x, y, z, scene) {
+    super(type, models, x, y, z);
+    this.scene = scene;
+    this.isJumping = false;
+    this.duration = 400; // Thời gian mỗi animation
+    this.ScoreNow = 0;
+    this.counter = 0;
+  }
 
-    play(models, scene) {
-        const movementDistance = 1;
-        let pressedKey = false;
+  play(models, scene) {
+    const movementDistance = 1;
+    let pressedKey = false;
 
-        // Event listener for keydown
-        document.addEventListener('keydown', (event) => {
-            if (!pressedKey) {
-                pressedKey = true;
-                setTimeout(() => {
-                    pressedKey = false;
-                }, this.duration)
+    // Event listener for keydown
 
-                let keyCode = event.code;
-                let deltaX = 0, deltaZ = 0;
+    document.addEventListener("keydown", (event) => {
+      try {
+        if (!pressedKey) {
+          pressedKey = true;
+          setTimeout(() => {
+            pressedKey = false;
+          }, this.duration);
 
-                switch (keyCode) {
-                    case "ArrowLeft":
-                        deltaX = +movementDistance; // sang trai
-                        this.jump();
-                        break;
-                    case "ArrowRight":
-                        deltaX = -movementDistance; //phai
-                        this.jump();
-                        break;
-                    case "ArrowDown":
-                        deltaZ = -movementDistance; // xuong
-                        this.jump();
-                        break;
-                    case "ArrowUp":
-                        deltaZ = +movementDistance; // len
-                        this.jump();
-                        this.targetZ = this.posZ + deltaZ;
-                        const laneType = generateRandomPosition(0, 2) === 0 ? 'field' : 'road';
-                        createLane(laneType, this.targetZ + 15, models, scene)
-                        break;
-                }
+          let keyCode = event.code;
+          let deltaX = 0,
+            deltaZ = 0;
 
-                this.targetX = this.posX + deltaX;
-                this.targetZ = this.posZ + deltaZ;
+          switch (keyCode) {
+            case "ArrowLeft":
+              deltaX = +movementDistance; // sang trai
+              this.jump(deltaX, deltaZ);
+              break;
 
-                this.setPosition(this.posX, 0, this.posZ);
-                this.model.lookAt(this.targetX, 0, this.targetZ);
+            case "ArrowRight":
+              deltaX = -movementDistance; //phai
+              this.jump(deltaX, deltaZ);
+              break;
 
-                // const cameraOffset = new Vector3(deltaX, 0, deltaZ);
-                // this.camera.position.add(cameraOffset);
-                // this.camera.position.x = Math.max(-10, Math.min(10, this.camera.position.x));
-                // this.camera.position.z = Math.max(-10, Math.min(10, this.camera.position.z));
-                // this.camera.lookAt(this.model.position);
+            case "ArrowDown":
+              if (this.targetZ != 0) {
+                deltaZ = -movementDistance; // xuong
+                this.jump(deltaX, deltaZ);
+                this.counter--;
+                // deleteLane(scene)
+              }
+              break;
 
-                // const cameraOffset = new Vector3(deltaX, 0, deltaZ);
-                // this.camera.position.add(cameraOffset);
-                // this.camera.position.x = Math.max(-laneWidth * lanes.length / 2, Math.min(laneWidth * lanes.length / 2, this.camera.position.x));
-                // this.camera.position.z = Math.max(-lanes.length * 2, Math.min(lanes.length * 2, this.camera.position.z));
+            case "ArrowUp": {
+              deltaZ = +movementDistance; // len
+              this.jump(deltaX, deltaZ);
+              this.targetZ = this.posZ + deltaZ;
+              // thêm lane
+              const laneType =
+                generateRandomPosition(0, 2) === 0 ? "field" : "road";
+              const direction = Math.random() < 0.5 ? "left" : "right";
 
-                // this.camera.lookAt(this.model.position);
+              new Lane(laneType, direction, this.targetZ + 13, models, scene)
+              this.counter++;
+              if (this.counter > this.ScoreNow) {
+                this.ScoreNow = this.counter;
+              }
+              if (this.ScoreNow >= currentMaxScore) {
+                localStorage.setItem("maxScoreFunWorld", this.counter);
+                maxScore.innerText = "Max: " + this.ScoreNow;
+              }
+              counterDOM.innerText = this.ScoreNow;
+              break;
             }
-        })
-    }
 
-    jump() {
-        if (!this.isJumping) {
-            this.isJumping = true;
-            this.startTime = Date.now();
-            this.jumpStartPosY = this.model.position.y;
-            this.animate();
+            default:
+              return;
+          }
+
+          // playSfx("jump");
+
+
+
         }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+
+  jump(deltaX, deltaZ) {
+    let trees = generateLanes(this.model, this.scene).list_trees;
+
+    let playerBox = new THREE.Box3().setFromObject(this.model);
+    var size = new THREE.Vector3();
+    playerBox.getSize(size);
+
+    // Lấy chiều dài, chiều rộng và chiều cao từ kích thước
+    var length = size.x;
+    var width = size.y;
+    var height = size.z;
+
+    let futurePlayerBox = new THREE.Box3().set(
+      new THREE.Vector3(this.posX + deltaX, this.posY, this.posZ + deltaZ), // Tọa độ góc dưới bên trái của hình hộp
+      new THREE.Vector3(this.posX + deltaX + length, this.posY + width, this.posZ + deltaZ + height) // Tọa độ góc trên bên phải của hình hộp
+    );
+
+
+    var futurePlayerBoxHelper = new THREE.Box3Helper(futurePlayerBox, 0xff0000); // Màu đỏ
+
+    // Thêm hộp dây vào scene
+    // this.scene.add(futurePlayerBoxHelper);
+
+    var isCollisions = false;
+    for (let i = 0; i < trees.length; i++) {
+      let tree = trees[i];
+
+      // Tạo hình hộp bao quanh cây
+      let treeBox = new THREE.Box3().setFromObject(tree.model);
+
+      // Kiểm tra va chạm giữa futurePlayerBox và treeBox
+      if (futurePlayerBox.intersectsBox(treeBox)) {
+        isCollisions = true;
+      }
     }
 
-    animate() {
-        const jumpHeight = 0.75; // Độ cao của nhảy
+    if (isCollisions === false) {
+      this.targetX = this.posX + deltaX;
+      this.targetZ = this.posZ + deltaZ;
 
-        const elapsedTime = Date.now() - this.startTime;
-        const progress = Math.min(elapsedTime / this.duration, 1); // Ensure jump completes within duration
+      playSfx("jump");
+      if (!this.isJumping) {
+        this.isJumping = true;
+        this.startTime = Date.now();
+        this.jumpStartPosY = this.model.position.y;
+        this.animate();
+      }
 
-        const jumpPosition = this.jumpStartPosY + jumpHeight * Math.sin(Math.PI * progress);
-        const horizontalPosition = this.posX + (this.targetX - this.posX) * progress;
-        const verticalPosition = this.posZ + (this.targetZ - this.posZ) * progress;
-
-        this.model.position.y = jumpPosition;
-        this.model.position.x = horizontalPosition;
-        this.model.position.z = verticalPosition;
-
-        const boundingBox = new THREE.Box3().setFromObject(this.model);
-        const center = new THREE.Vector3();
-        boundingBox.getCenter(center);
-
-
-        this.camera.position.set(center.x + 3, 10, center.z - 6)
-        const targetPosition = new THREE.Vector3(center.x, 0, center.z)
-        this.camera.lookAt(targetPosition)
-
-        if (elapsedTime < this.duration) {
-            requestAnimationFrame(() => this.animate());
-        } else {
-            this.isJumping = false;
-            // Reset player position to ground level
-            this.model.position.y = this.jumpStartPosY;
-            this.posX = Math.max(-10, Math.min(10, this.targetX));
-            this.posZ = this.targetZ;
-        }
+      // this.setPosition(this.posX, 0, this.posZ);
+      this.model.lookAt(this.targetX, 0, this.targetZ);
+    } else {
+      console.error("Con lon dam dau vao cay roi");
     }
+  }
+
+  animate() {
+    const jumpHeight = 0.75; // Độ cao của nhảy
+
+    const elapsedTime = Date.now() - this.startTime;
+    const progress = Math.min(elapsedTime / this.duration, 1); // Ensure jump completes within duration
+
+    const jumpPosition =
+      this.jumpStartPosY + jumpHeight * Math.sin(Math.PI * progress);
+    const horizontalPosition =
+      this.posX + (this.targetX - this.posX) * progress;
+    const verticalPosition = this.posZ + (this.targetZ - this.posZ) * progress;
+
+    this.model.position.y = jumpPosition;
+    this.model.position.x = horizontalPosition;
+    this.model.position.z = verticalPosition;
+
+    if (elapsedTime < this.duration) {
+      requestAnimationFrame(() => this.animate());
+    } else {
+      this.isJumping = false;
+      // Reset player position to ground level
+      this.model.position.y = this.jumpStartPosY;
+      this.posX = Math.max(-10, Math.min(10, this.targetX));
+      this.posZ = this.targetZ;
+    }
+  }
 }
