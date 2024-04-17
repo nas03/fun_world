@@ -46,7 +46,8 @@ export class Player extends Entity {
               if (this.targetZ != 0) {
                 deltaZ = -movementDistance;// xuong
                 this.jump();
-                // deleteLane(scene)
+                this.counter--;
+                this.ScoreNow = this.counter
               }
               break;
 
