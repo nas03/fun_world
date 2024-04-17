@@ -31,9 +31,7 @@ exports.getAll = async function (req, res) {
 exports.update = async function (req, res) {
     try {
         const data = req.body;
-        console.log(data)
         const userId = data._id;
-        console.log(userId)
         const response = await userModel.update(userId, data)
         return res.status(200).json({
             message: 'OK',

@@ -51,6 +51,9 @@ export class Lane extends Entity {
         }
     }
 }
+export function getLanes() {
+    return lanes;
+}
 export function generateRandomPosition(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
