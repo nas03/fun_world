@@ -178,17 +178,31 @@ const initGame = () => {
   if (!localStorage.getItem("maxScoreFunWorld")) {
     localStorage.setItem("maxScoreFunWorld", 0);
   }
-
   maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld");
 
   const startButton = document.querySelector("#start");
-  const title = document.querySelector("#title");
+  const gameTitle = document.querySelector("#gameTitle");
+
   startButton.addEventListener("click", () => {
     startButton.remove();
-    title.remove();
+    gameTitle.remove();
     playMusic();
     player.play(models, scene);
   });
+
+  const form = document.querySelector(".form");
+  if(localStorage.getItem("name")) {
+    form.style.display = "none";
+  } else {
+    startButton.style.display = "none";
+    const submit = document.querySelector(".submit");
+    submit.addEventListener("click", () => {
+      const name = document.querySelector("#name");
+      localStorage.setItem("name", name.value);
+      form.style.display = "none";
+      startButton.style.display = "block";
+    })
+  }
 
   playGame();
 };
@@ -239,13 +253,9 @@ function checkCollisions() {
     }*/
 }
 
-function endGame(event) {
+function endGame() {
   retry.style.display = "block";
-
-  event.preventDefault();
-  document.addEventListener("keydown", function (event) {
-    event.preventDefault();
-  });
+  player.isDead = true;
 }
 
 function animate() {
@@ -269,11 +279,12 @@ function animate() {
 animate();
 
 retryButton.addEventListener("click", function () {
-  var endGameDiv = document.querySelector(".end-game");
+  const endGameDiv = document.querySelector(".end-game");
   endGameDiv.style.display = "none";
   player.setPosition(0, 0, 0);
   camera.position.set(4, 12, -5);
   player.counter = 0;
+  player.isDead = false;
   counterCurrent.innerText = player.counter;
 });
 
