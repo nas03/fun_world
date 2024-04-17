@@ -1,18 +1,20 @@
 import { Entity } from "./entity";
 import {
+  generateLanes,
   generateRandomPosition,
 } from "../utilities/generateMap.js";
 import { playSfx } from "../utilities/playSound.js";
 import { Lane } from "../utilities/generateMap.js"
+import * as THREE from "three";
+
 const counterDOM = document.getElementById("counter");
 const maxScore = document.getElementById("maxScore");
 const currentMaxScore = localStorage.getItem("maxScoreFunWorld");
 
 export class Player extends Entity {
-  isDead = false;
-
-  constructor(type, models, x, y, z) {
+  constructor(type, models, x, y, z, scene) {
     super(type, models, x, y, z);
+    this.scene = scene;
     this.isJumping = false;
     this.duration = 400; // Thời gian mỗi animation
     this.ScoreNow = 0;
@@ -27,7 +29,7 @@ export class Player extends Entity {
 
     document.addEventListener("keydown", (event) => {
       try {
-        if (!pressedKey && !this.isDead) {
+        if (!pressedKey) {
           pressedKey = true;
           setTimeout(() => {
             pressedKey = false;
@@ -40,18 +42,18 @@ export class Player extends Entity {
           switch (keyCode) {
             case "ArrowLeft":
               deltaX = +movementDistance; // sang trai
-              this.jump();
+              this.jump(deltaX, deltaZ);
               break;
 
             case "ArrowRight":
               deltaX = -movementDistance; //phai
-              this.jump();
+              this.jump(deltaX, deltaZ);
               break;
 
             case "ArrowDown":
               if (this.targetZ != 0) {
                 deltaZ = -movementDistance; // xuong
-                this.jump();
+                this.jump(deltaX, deltaZ);
                 this.counter--;
                 // deleteLane(scene)
               }
@@ -59,7 +61,7 @@ export class Player extends Entity {
 
             case "ArrowUp": {
               deltaZ = +movementDistance; // len
-              this.jump();
+              this.jump(deltaX, deltaZ);
               this.targetZ = this.posZ + deltaZ;
               // thêm lane
               const laneType =
@@ -83,13 +85,10 @@ export class Player extends Entity {
               return;
           }
 
-          playSfx("jump");
+          // playSfx("jump");
 
-          this.targetX = this.posX + deltaX;
-          this.targetZ = this.posZ + deltaZ;
 
-          this.setPosition(this.posX, 0, this.posZ);
-          this.model.lookAt(this.targetX, 0, this.targetZ);
+
         }
       } catch (error) {
         console.log(error);
@@ -97,12 +96,58 @@ export class Player extends Entity {
     });
   }
 
-  jump() {
-    if (!this.isJumping) {
-      this.isJumping = true;
-      this.startTime = Date.now();
-      this.jumpStartPosY = this.model.position.y;
-      this.animate();
+  jump(deltaX, deltaZ) {
+    let trees = generateLanes(this.model, this.scene).list_trees;
+
+    let playerBox = new THREE.Box3().setFromObject(this.model);
+    var size = new THREE.Vector3();
+    playerBox.getSize(size);
+
+    // Lấy chiều dài, chiều rộng và chiều cao từ kích thước
+    var length = size.x;
+    var width = size.y;
+    var height = size.z;
+
+    let futurePlayerBox = new THREE.Box3().set(
+      new THREE.Vector3(this.posX + deltaX, this.posY, this.posZ + deltaZ), // Tọa độ góc dưới bên trái của hình hộp
+      new THREE.Vector3(this.posX + deltaX + length, this.posY + width, this.posZ + deltaZ + height) // Tọa độ góc trên bên phải của hình hộp
+    );
+
+
+    var futurePlayerBoxHelper = new THREE.Box3Helper(futurePlayerBox, 0xff0000); // Màu đỏ
+
+    // Thêm hộp dây vào scene
+    // this.scene.add(futurePlayerBoxHelper);
+
+    var isCollisions = false;
+    for (let i = 0; i < trees.length; i++) {
+      let tree = trees[i];
+
+      // Tạo hình hộp bao quanh cây
+      let treeBox = new THREE.Box3().setFromObject(tree.model);
+
+      // Kiểm tra va chạm giữa futurePlayerBox và treeBox
+      if (futurePlayerBox.intersectsBox(treeBox)) {
+        isCollisions = true;
+      }
+    }
+
+    if (isCollisions === false) {
+      this.targetX = this.posX + deltaX;
+      this.targetZ = this.posZ + deltaZ;
+
+      playSfx("jump");
+      if (!this.isJumping) {
+        this.isJumping = true;
+        this.startTime = Date.now();
+        this.jumpStartPosY = this.model.position.y;
+        this.animate();
+      }
+
+      // this.setPosition(this.posX, 0, this.posZ);
+      this.model.lookAt(this.targetX, 0, this.targetZ);
+    } else {
+      console.error("Con lon dam dau vao cay roi");
     }
   }
 

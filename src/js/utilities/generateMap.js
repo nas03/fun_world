@@ -4,6 +4,7 @@ import { Entity } from '../entities/entity.js';
 const laneWidth = 11;
 let lanes = []
 let cars = []
+let list_trees = []
 
 export class Lane extends Entity {
     constructor(type, direction, zPosition, models, scene) {
@@ -33,6 +34,7 @@ export class Lane extends Entity {
                         const treeX = generateRandomPosition(-laneWidth, laneWidth);
                         const tree = new Entity(treeType, models, treeX, 0, this.zPosition);
                         scene.add(tree.model);
+                        list_trees.push(tree)
                         this.entities.push(tree);
                     }
                 }
@@ -68,7 +70,7 @@ export function generateLanes(models, scene) {
         new Lane(laneType, direction, i, models, scene);
         zPosition += 1;
     }
-    return { lanes, cars }
+    return { lanes, cars, list_trees }
 }
 export function generateCars(models, scene, zPosition, direction) {
     let car_entities = []

@@ -9,10 +9,10 @@ export class Entity {
             if (m.type === type && m.model) {
                 this.model = m.model.clone();
                 break;
-            } 
+            }
         }
-        if(!this.model){
-            console.error("model " + type + " not found");
+        if (!this.model) {
+            console.error("model: " + type + " not found");
         }
         // Check if model is not null before setting position
         this.setPosition(x, y, z);

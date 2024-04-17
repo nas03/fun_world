@@ -191,7 +191,7 @@ const initGame = () => {
   });
 
   const form = document.querySelector(".form");
-  if(localStorage.getItem("name")) {
+  if (localStorage.getItem("name")) {
     form.style.display = "none";
   } else {
     startButton.style.display = "none";
@@ -237,25 +237,29 @@ function checkCollisions() {
     }
   }
 
-  /*const trees = [tree0, tree1, tree2, tree3];
-    for (let i = 0; i < trees.length; i++) {
-        const tree = trees[i];
-        const treePosition = tree.model.position;
-        const distanceToTree = player.model.position.distanceTo(treePosition);
-        // Nếu khoảng cách nhỏ hơn ngưỡng va chạm với cây, xem như có va chạm
-        if (distanceToTree < collisionThreshold) {
-            // Lưu lại vị trí hợp lệ trước đó của người chơi
-            player.lastValidPosition.copy(player.model.position);
-            // Thiết lập lại vị trí của người chơi để ngăn chúng đi qua cây
-            player.setPosition(player.lastValidPosition.x, player.lastValidPosition.y, player.lastValidPosition.z);
-            return;
-        }
-    }*/
+
+  // for (let i = 0; i < trees.length; i++) {
+  //   const tree = trees[i];
+  //   const treePosition = tree.model.position;
+  //   const distanceToTree = player.model.position.distanceTo(treePosition);
+  //   // Nếu khoảng cách nhỏ hơn ngưỡng va chạm với cây, xem như có va chạm
+  //   if (distanceToTree < collisionThreshold) {
+  //     // Lưu lại vị trí hợp lệ trước đó của người chơi
+  //     player.lastValidPosition.copy(player.model.position);
+  //     // Thiết lập lại vị trí của người chơi để ngăn chúng đi qua cây
+  //     player.setPosition(player.lastValidPosition.x, player.lastValidPosition.y, player.lastValidPosition.z);
+  //     return;
+  //   }
+  // }
 }
 
-function endGame() {
+function endGame(event) {
   retry.style.display = "block";
-  player.isDead = true;
+
+  event.preventDefault();
+  document.addEventListener("keydown", function (event) {
+    event.preventDefault();
+  });
 }
 
 function animate() {
