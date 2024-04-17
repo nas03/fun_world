@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { create, getAll} from '../controller/userController'
-import { update } from '@/model/user';
+import { create, getAll, update} from '../controller/userController'
+
 const api = Router()
 
 api.post('/api/user', create)
