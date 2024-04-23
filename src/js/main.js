@@ -7,6 +7,7 @@ import { playMusic } from "./utilities/playSound.js";
 import axios from 'axios';
 import toastr from 'toastr';
 
+const baseUrl = "http://localhost:5000/api/user"
 const rankButton = document.getElementById("see-rank");
 const retryButton = document.querySelector(".end-game button");
 const closeButton = document.getElementById("btn-close");
@@ -174,15 +175,48 @@ function onResize() {
   renderer.setPixelRatio(window.devicePixelRatio);
 }
 
-function showToast(message) {
-  toastr.info(message);
+async function getDataRank() {
+  try {
+    const response = await axios.get(baseUrl)
+    if (response.data.message === "OK") {
+      const rankContainer = document.querySelector(".rank-container");
+      const rankHeader = rankContainer.querySelector(".rank-header");
+      rankHeader.innerHTML = "";
+
+      const rankRow = document.createElement("div");
+      rankRow.classList.add("rank-header");
+      rankRow.innerHTML = `
+        <p>Rank</p>
+        <p>Score</p>
+      `;
+      rankHeader.appendChild(rankRow);
+
+      const users = response.data.data.sort((userA, userB) => userB.score - userA.score);
+      for (let i = 0; i < users.length; i++) {
+        const user = users[i];
+        const rankItem = document.createElement("div");
+        rankItem.classList.add("rank-item");
+        rankItem.innerHTML = `
+          <p>${i + 1}</p>
+          <p>${user.name}</p>
+          <p>${user.score}</p>
+        `;
+        rankContainer.appendChild(rankItem);
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 const initGame = async () => {
   window.addEventListener("resize", onResize);
-  if (!localStorage.getItem("maxScoreFunWorld")) {
+  if (!localStorage.getItem("maxScoreFunWorld") || localStorage.getItem("maxScoreFunWorld" == null)) {
     localStorage.setItem("maxScoreFunWorld", 0);
   }
+
+  getDataRank()
+
   maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld");
 
   const startButton = document.querySelector("#start");
@@ -209,7 +243,7 @@ const initGame = async () => {
       }
       try {
         const data = name.value
-        const response = await axios.post('http://localhost:5000/api/user', {
+        const response = await axios.post(baseUrl, {
           name: data
         });
         console.log(response)
@@ -278,11 +312,10 @@ function checkCollisions() {
   // }
 }
 
-function endGame(event) {
+function endGame() {
   retry.style.display = "block";
 
-  event.preventDefault();
-  document.addEventListener("keydown", function (event) {
+  document.addEventListener("keydown", async function (event) {
     event.preventDefault();
   });
 }
@@ -293,7 +326,7 @@ function animate() {
 
   if (models) {
     animateVehicle(models);
-  } 
+  }
 
   const boundingBox = new THREE.Box3().setFromObject(player.model);
   const center = new THREE.Vector3();
@@ -307,7 +340,22 @@ function animate() {
 
 animate();
 
-retryButton.addEventListener("click", function () {
+retryButton.addEventListener("click", async function () {
+  try {
+    console.log(player.ScoreNow)
+    if (player.ScoreNow > localStorage.getItem("maxScoreFunWorld")) {
+      localStorage.setItem("maxScoreFunWorld", player.ScoreNow);
+      const data = {
+        _id: localStorage.getItem("userId"),
+        score: localStorage.getItem("maxScoreFunWorld")
+      }
+      const response = await axios.put(baseUrl, data)
+      getDataRank()
+    }
+  } catch (error) {
+    console.error("Error sending user name to API:", error);
+  }
+
   const endGameDiv = document.querySelector(".end-game");
   endGameDiv.style.display = "none";
   player.setPosition(0, 0, 0);

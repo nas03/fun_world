@@ -69,12 +69,11 @@ export class Player extends Entity {
               const direction = Math.random() < 0.5 ? "left" : "right";
 
               new Lane(laneType, direction, this.targetZ + 13, models, scene)
-              this.counter++;
+              this.counter++; 
               if (this.counter > this.ScoreNow) {
                 this.ScoreNow = this.counter;
               }
               if (this.ScoreNow >= currentMaxScore) {
-                localStorage.setItem("maxScoreFunWorld", this.counter);
                 maxScore.innerText = "Max: " + this.ScoreNow;
               }
               counterDOM.innerText = this.ScoreNow;
