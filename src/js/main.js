@@ -252,7 +252,7 @@ const initGame = async () => {
           return;
         }
 
-        localStorage.setItem("name", name);
+        localStorage.setItem("name", response.data.account.name);
         localStorage.setItem("userId", response.data.account._id)
         localStorage.setItem("maxScoreFunWorld", response.data.account.score)
         form.style.display = "none";
