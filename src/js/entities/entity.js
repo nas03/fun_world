@@ -25,8 +25,6 @@ export class Entity {
         // Check if model is not null before setting position
         if (this.model) {
             this.model.position.set(this.posX, this.posY, this.posZ);
-        } else {
-            console.error("Model not found");
         }
     }
 

@@ -87,7 +87,6 @@ export class Player extends Entity {
           // playSfx("jump");
 
 
-
         }
       } catch (error) {
         console.log(error);
@@ -99,26 +98,20 @@ export class Player extends Entity {
     let trees = generateLanes(this.model, this.scene).list_trees;
 
     let playerBox = new THREE.Box3().setFromObject(this.model);
-    var size = new THREE.Vector3();
+    const size = new THREE.Vector3();
     playerBox.getSize(size);
 
     // Lấy chiều dài, chiều rộng và chiều cao từ kích thước
-    var length = size.x;
-    var width = size.y;
-    var height = size.z;
+    const length = size.x;
+    const width = size.y;
+    const height = size.z;
 
-    let futurePlayerBox = new THREE.Box3().set(
+    let futurePlayerBox = new THREE.Box3().setFromCenterAndSize(
       new THREE.Vector3(this.posX + deltaX, this.posY, this.posZ + deltaZ), // Tọa độ góc dưới bên trái của hình hộp
-      new THREE.Vector3(this.posX + deltaX + length, this.posY + width, this.posZ + deltaZ + height) // Tọa độ góc trên bên phải của hình hộp
+      new THREE.Vector3(length - 0.5, width, height - 0.5) // Tọa độ góc trên bên phải của hình hộp
     );
 
-
-    var futurePlayerBoxHelper = new THREE.Box3Helper(futurePlayerBox, 0xff0000); // Màu đỏ
-
-    // Thêm hộp dây vào scene
-    // this.scene.add(futurePlayerBoxHelper);
-
-    var isCollisions = false;
+    let isCollisions = false;
     for (let i = 0; i < trees.length; i++) {
       let tree = trees[i];
 
