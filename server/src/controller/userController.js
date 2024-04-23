@@ -3,12 +3,13 @@ const userModel = require('../model/user')
 exports.create = async function (req, res) {
     try {
         const data = req.body;
+        console.log(data)
         const checkUser = await userModel.get(data)
         if (checkUser) return res.status(400).json({ message: "Account existed" })
 
         const newUser = await userModel.create(data)
         return res.status(200).json({
-            message: 'Register successfully',
+            message: 'Register successfully',  
             account: newUser
         })
     } catch (error) {

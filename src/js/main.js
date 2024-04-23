@@ -4,6 +4,7 @@ import { loadAllModels } from "./utilities/loadModelFromDish.js";
 import { Player } from "./entities/player.js";
 import { generateLanes, animateVehicle } from "./utilities/generateMap.js";
 import { playMusic } from "./utilities/playSound.js";
+import axios from 'axios';
 
 const rankButton = document.getElementById("see-rank");
 const retryButton = document.querySelector(".end-game button");
@@ -172,7 +173,7 @@ function onResize() {
   renderer.setPixelRatio(window.devicePixelRatio);
 }
 
-const initGame = () => {
+const initGame = async () => {
   window.addEventListener("resize", onResize);
 
   if (!localStorage.getItem("maxScoreFunWorld")) {
@@ -196,11 +197,30 @@ const initGame = () => {
   } else {
     startButton.style.display = "none";
     const submit = document.querySelector(".submit");
-    submit.addEventListener("click", () => {
-      const name = document.querySelector("#name");
-      localStorage.setItem("name", name.value);
-      form.style.display = "none";
-      startButton.style.display = "block";
+    submit.addEventListener("click", async () => {
+      const name = document.getElementById("name");
+      if (!name.value.trim) {
+        console.error("Please enter a name.");
+        return;
+      }
+      try {
+        const data = name.value
+        console.log(data)
+        const response = await axios.post('http://localhost:5000/api/user', {
+          data
+        });
+        console.log(response)
+        if (!response.data.success) {
+          console.error("Error creating user:", response.data.message);
+          return;
+        }
+
+        localStorage.setItem("name", name);
+        form.style.display = "none";
+        startButton.style.display = "block";
+      } catch (error) {
+        console.error("Error sending user name to API:", error);
+      }
     })
   }
 
