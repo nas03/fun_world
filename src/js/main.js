@@ -283,29 +283,11 @@ function checkCollisions() {
       return;
     }
   }
-
-
-  // for (let i = 0; i < trees.length; i++) {
-  //   const tree = trees[i];
-  //   const treePosition = tree.model.position;
-  //   const distanceToTree = player.model.position.distanceTo(treePosition);
-  //   // Nếu khoảng cách nhỏ hơn ngưỡng va chạm với cây, xem như có va chạm
-  //   if (distanceToTree < collisionThreshold) {
-  //     // Lưu lại vị trí hợp lệ trước đó của người chơi
-  //     player.lastValidPosition.copy(player.model.position);
-  //     // Thiết lập lại vị trí của người chơi để ngăn chúng đi qua cây
-  //     player.setPosition(player.lastValidPosition.x, player.lastValidPosition.y, player.lastValidPosition.z);
-  //     return;
-  //   }
-  // }
 }
 
 function endGame() {
   retry.style.display = "block";
-
-  document.addEventListener("keydown", async function (event) {
-    event.preventDefault();
-  });
+  player.isDead = true;
 }
 
 function animate() {
