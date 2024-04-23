@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"; // Add '.js' extension
 import { loadAllModels } from "./utilities/loadModelFromDish.js";
 import { Player } from "./entities/player.js";
 import { generateLanes, animateVehicle } from "./utilities/generateMap.js";
@@ -15,6 +14,8 @@ const counterCurrent = document.getElementById("counter");
 const maxScore = document.getElementById("maxScore");
 const retry = document.querySelector(".end-game");
 const rankInformation = document.querySelector(".rank-container");
+const startButton = document.querySelector("#start");
+const gameTitle = document.querySelector("#gameTitle");
 
 let cars = [];
 let player;
@@ -38,8 +39,6 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
-const orbit = new OrbitControls(camera, renderer.domElement);
 
 //Light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Màu trắng, intensity 1
@@ -219,16 +218,6 @@ const initGame = async () => {
 
   maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld");
 
-  const startButton = document.querySelector("#start");
-  const gameTitle = document.querySelector("#gameTitle");
-
-  startButton.addEventListener("click", () => {
-    startButton.remove();
-    gameTitle.remove();
-    playMusic();
-    player.play(models, scene);
-  });
-
   const form = document.querySelector(".form");
   if (localStorage.getItem("name")) {
     form.style.display = "none";
@@ -267,6 +256,7 @@ const initGame = async () => {
 };
 
 initGame();
+addEvent();
 
 function playGame() {
   if (models === null || models === undefined) {
@@ -279,8 +269,6 @@ function playGame() {
 
   cars = generateLanes(models, scene).cars;
 }
-
-orbit.update();
 
 const collisionThreshold = 1;
 
@@ -340,35 +328,49 @@ function animate() {
 
 animate();
 
-retryButton.addEventListener("click", async function () {
-  try {
-    console.log(player.ScoreNow)
-    if (player.ScoreNow > localStorage.getItem("maxScoreFunWorld")) {
-      localStorage.setItem("maxScoreFunWorld", player.ScoreNow);
-      const data = {
-        _id: localStorage.getItem("userId"),
-        score: localStorage.getItem("maxScoreFunWorld")
+function addEvent() {
+  retryButton.addEventListener("click", async function () {
+    try {
+      console.log(player.ScoreNow)
+      if (player.ScoreNow > localStorage.getItem("maxScoreFunWorld")) {
+        localStorage.setItem("maxScoreFunWorld", player.ScoreNow);
+        const data = {
+          _id: localStorage.getItem("userId"),
+          score: localStorage.getItem("maxScoreFunWorld")
+        }
+        const response = await axios.put(baseUrl, data)
+        getDataRank()
       }
-      const response = await axios.put(baseUrl, data)
-      getDataRank()
+    } catch (error) {
+      console.error("Error sending user name to API:", error);
     }
-  } catch (error) {
-    console.error("Error sending user name to API:", error);
-  }
+  
+    const endGameDiv = document.querySelector(".end-game");
+    endGameDiv.style.display = "none";
+    player.setPosition(0, 0, 0);
+    camera.position.set(4, 12, -5);
+    player.counter = 0;
+    player.isDead = false;
+    counterCurrent.innerText = player.counter;
+  });
+  
+  rankButton.addEventListener("click", function () {
+    rankInformation.style.display = "block";
+    startButton.style.display = "none";
+    gameTitle.style.display = "none";
+  });
+  
+  closeButton.addEventListener("click", function () {
+    rankInformation.style.display = "none";
+    startButton.style.display = "block";
+    gameTitle.style.display = "block";
+  });
+  
+  startButton.addEventListener("click", () => {
+    startButton.style.display = "none";
+    gameTitle.style.display = "none";
+    playMusic();
+    player.play(models, scene);
+  });
+}
 
-  const endGameDiv = document.querySelector(".end-game");
-  endGameDiv.style.display = "none";
-  player.setPosition(0, 0, 0);
-  camera.position.set(4, 12, -5);
-  player.counter = 0;
-  player.isDead = false;
-  counterCurrent.innerText = player.counter;
-});
-
-rankButton.addEventListener("click", function () {
-  rankInformation.style.display = "block";
-});
-
-closeButton.addEventListener("click", function () {
-  rankInformation.style.display = "none";
-});
