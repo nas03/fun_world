@@ -120,7 +120,7 @@ export function animateVehicle() {
                     car.model.position.set(temp, carPos.y, carPos.z);
 
                     if (Math.round(temp) == laneWidth * direction) {
-                        carPos.x = direction === "left" ? laneWidth : -laneWidth;
+                        carPos.x = car.direction === "left" ? laneWidth : -laneWidth;
                     }
                 }, index * 1000);
             });
