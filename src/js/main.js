@@ -5,6 +5,7 @@ import { Player } from "./entities/player.js";
 import { generateLanes, animateVehicle } from "./utilities/generateMap.js";
 import { playMusic } from "./utilities/playSound.js";
 import axios from 'axios';
+import toastr from 'toastr';
 
 const rankButton = document.getElementById("see-rank");
 const retryButton = document.querySelector(".end-game button");
@@ -173,9 +174,12 @@ function onResize() {
   renderer.setPixelRatio(window.devicePixelRatio);
 }
 
+function showToast(message) {
+  toastr.info(message);
+}
+
 const initGame = async () => {
   window.addEventListener("resize", onResize);
-
   if (!localStorage.getItem("maxScoreFunWorld")) {
     localStorage.setItem("maxScoreFunWorld", 0);
   }
@@ -199,23 +203,24 @@ const initGame = async () => {
     const submit = document.querySelector(".submit");
     submit.addEventListener("click", async () => {
       const name = document.getElementById("name");
-      if (!name.value.trim) {
-        console.error("Please enter a name.");
+      if (!name.value.trim || name.value == '') {
+        toastr.info("Please enter a name.");
         return;
       }
       try {
         const data = name.value
-        console.log(data)
         const response = await axios.post('http://localhost:5000/api/user', {
-          data
+          name: data
         });
         console.log(response)
-        if (!response.data.success) {
+        if (!response.data.account) {
           console.error("Error creating user:", response.data.message);
           return;
         }
 
         localStorage.setItem("name", name);
+        localStorage.setItem("userId", response.data.account._id)
+        localStorage.setItem("maxScoreFunWorld", response.data.account.score)
         form.style.display = "none";
         startButton.style.display = "block";
       } catch (error) {
@@ -288,7 +293,7 @@ function animate() {
 
   if (models) {
     animateVehicle(models);
-  }
+  } 
 
   const boundingBox = new THREE.Box3().setFromObject(player.model);
   const center = new THREE.Vector3();
