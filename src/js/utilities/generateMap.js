@@ -61,14 +61,12 @@ export function generateRandomPosition(min, max) {
 }
 
 export function generateLanes(models, scene) {
-    let zPosition = 0;
     for (let i = -9; i <= 13; i++) {
         let randomNumber = generateRandomPosition(1, 10)
         const laneType = i <= 0 || i == 1 ? 'field' : randomNumber >= 1 && randomNumber <= 4 ? 'field' : randomNumber >= 5 && randomNumber <= 8 ? 'road' : 'railroad';
         const direction = Math.random() < 0.5 ? 'left' : 'right';
 
         new Lane(laneType, direction, i, models, scene);
-        zPosition += 1;
     }
     return { lanes, cars, list_trees }
 }
@@ -119,11 +117,11 @@ export function animateVehicle() {
                     const direction = car.direction === "left" ? -1 : 1;
                     const temp = (carPos.x + 0.05 * direction);
 
-                    if (Math.round(temp) == laneWidth * direction) {
-                        car.direction = (direction === -1 ? "right" : "left");
-                        car.model.rotateY(Math.PI);
-                    }
                     car.model.position.set(temp, carPos.y, carPos.z);
+
+                    if (Math.round(temp) == laneWidth * direction) {
+                        carPos.x = direction === "left" ? laneWidth : -laneWidth;
+                    }
                 }, index * 1000);
             });
         }
