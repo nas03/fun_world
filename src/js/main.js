@@ -4,7 +4,8 @@ import { Player } from "./entities/player.js";
 import { generateLanes, animateVehicle } from "./utilities/generateMap.js";
 import { playMusic } from "./utilities/playSound.js";
 import axios from 'axios';
-import toastr from 'toastr';
+import toastr, { error } from 'toastr';
+import { Entity } from "./entities/entity.js";
 
 const baseUrl = "https://funroad-server.onrender.com/api/user"
 const rankButton = document.getElementById("see-rank");
@@ -41,15 +42,18 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 //Light
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Màu trắng, intensity 1
-directionalLight.position.set(-6, 6, -6);
-directionalLight.castShadow = true;
-directionalLight.intensity = 5;
-directionalLight.shadow.camera.left = -15; // Điểm bắt đầu bên trái của phạm vi camera
-directionalLight.shadow.camera.right = 15; // Điểm kết thúc bên phải của phạm vi camera
-directionalLight.shadow.camera.top = 15; // Điểm kết thúc phía trên của phạm vi camera
-directionalLight.shadow.camera.bottom = -15; // Điểm bắt đầu phía dưới của phạm vi camera
-scene.add(directionalLight);
+var shadowLight = new THREE.DirectionalLight(0xffffff, 1); // Màu trắng, intensity 1
+shadowLight.position.set(-50, 50, -50);
+shadowLight.castShadow = true;
+shadowLight.intensity = 5;
+shadowLight.shadow.camera.far = 100
+shadowLight.shadow.camera.left = -15; // Điểm bắt đầu bên trái của phạm vi camera
+shadowLight.shadow.camera.right = 15; // Điểm kết thúc bên phải của phạm vi camera
+shadowLight.shadow.camera.top = 15; // Điểm kết thúc phía trên của phạm vi camera
+shadowLight.shadow.camera.bottom = -15; // Điểm bắt đầu phía dưới của phạm vi camera
+scene.add(shadowLight);
+
+
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
@@ -160,6 +164,27 @@ const modelPaths = [
     ],
     type: ["police_car", "car"],
   },
+  {
+    path: [
+      "../assets/models/vehicles/train/back/0.obj",
+      "../assets/models/vehicles/train/back/0.png",
+    ],
+    type: ["back_train", "car"],
+  },
+  {
+    path: [
+      "../assets/models/vehicles/train/front/0.obj",
+      "../assets/models/vehicles/train/front/0.png",
+    ],
+    type: ["front_train", "car"],
+  },
+  {
+    path: [
+      "../assets/models/vehicles/train/middle/0.obj",
+      "../assets/models/vehicles/train/middle/0.png",
+    ],
+    type: ["middle_train", "car"],
+  }
 ];
 
 const models = await loadAllModels(modelPaths).catch((error) => {
@@ -264,7 +289,6 @@ function playGame() {
   }
 
   player = new Player("chicken", models, 0, 0, 0);
-
   scene.add(player.model);
 
   cars = generateLanes(models, scene).cars;
@@ -285,6 +309,18 @@ function checkCollisions() {
   }
 }
 
+function shadowCamFollowPlayer() {
+  let playerPos = player.model.position;
+  shadowLight.position.set(playerPos.x - 50, 50, playerPos.z - 50)
+
+  shadowLight.shadow.camera.left = playerPos.x - 15; // Điểm bắt đầu bên trái của phạm vi camera
+  shadowLight.shadow.camera.right = playerPos.x + 15; // Điểm kết thúc bên phải của phạm vi camera
+  shadowLight.shadow.camera.top = playerPos.z + 15; // Điểm kết thúc phía trên của phạm vi camera
+  shadowLight.shadow.camera.bottom = playerPos.z - 15; // Điểm bắt đầu phía dưới của phạm vi camera
+  // console.error(shadowLight.shadow.camera.left + " " + shadowLight.shadow.camera.right + " " +
+  //   shadowLight.shadow.camera.top + " " + shadowLight.shadow.camera.down);
+}
+
 function endGame() {
   retry.style.display = "block";
   player.isDead = true;
@@ -293,7 +329,8 @@ function endGame() {
 function animate() {
   requestAnimationFrame(animate);
   checkCollisions();
-
+  shadowCamFollowPlayer();
+  // controls.update()
   if (models) {
     animateVehicle(models);
   }
@@ -326,7 +363,7 @@ function addEvent() {
     } catch (error) {
       console.error("Error sending user name to API:", error);
     }
-  
+
     const endGameDiv = document.querySelector(".end-game");
     endGameDiv.style.display = "none";
     player.setPosition(0, 0, 0);
@@ -335,19 +372,19 @@ function addEvent() {
     player.isDead = false;
     counterCurrent.innerText = player.counter;
   });
-  
+
   rankButton.addEventListener("click", function () {
     rankInformation.style.display = "block";
     startButton.style.display = "none";
     gameTitle.style.display = "none";
   });
-  
+
   closeButton.addEventListener("click", function () {
     rankInformation.style.display = "none";
     startButton.style.display = "block";
     gameTitle.style.display = "block";
   });
-  
+
   startButton.addEventListener("click", () => {
     startButton.style.display = "none";
     gameTitle.style.display = "none";
