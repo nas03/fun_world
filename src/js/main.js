@@ -6,7 +6,7 @@ import { playMusic } from "./utilities/playSound.js";
 import axios from 'axios';
 import toastr from 'toastr';
 
-const baseUrl = "http://localhost:5000/api/user"
+const baseUrl = "https://funroad-server.onrender.com/api/user"
 const rankButton = document.getElementById("see-rank");
 const retryButton = document.querySelector(".end-game button");
 const closeButton = document.getElementById("btn-close");
