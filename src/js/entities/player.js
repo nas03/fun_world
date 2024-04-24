@@ -12,6 +12,8 @@ const maxScore = document.getElementById("maxScore");
 const currentMaxScore = localStorage.getItem("maxScoreFunWorld");
 
 export class Player extends Entity {
+  isDead = false;
+
   constructor(type, models, x, y, z, scene) {
     super(type, models, x, y, z);
     this.scene = scene;
@@ -29,7 +31,7 @@ export class Player extends Entity {
 
     document.addEventListener("keydown", (event) => {
       try {
-        if (!pressedKey) {
+        if (!pressedKey && !this.isDead) {
           pressedKey = true;
           setTimeout(() => {
             pressedKey = false;
@@ -69,12 +71,11 @@ export class Player extends Entity {
               const direction = Math.random() < 0.5 ? "left" : "right";
 
               new Lane(laneType, direction, this.targetZ + 13, models, scene)
-              this.counter++;
+              this.counter++; 
               if (this.counter > this.ScoreNow) {
                 this.ScoreNow = this.counter;
               }
               if (this.ScoreNow >= currentMaxScore) {
-                localStorage.setItem("maxScoreFunWorld", this.counter);
                 maxScore.innerText = "Max: " + this.ScoreNow;
               }
               counterDOM.innerText = this.ScoreNow;
@@ -88,7 +89,6 @@ export class Player extends Entity {
           // playSfx("jump");
 
 
-
         }
       } catch (error) {
         console.log(error);
@@ -100,26 +100,20 @@ export class Player extends Entity {
     let trees = generateLanes(this.model, this.scene).list_trees;
 
     let playerBox = new THREE.Box3().setFromObject(this.model);
-    var size = new THREE.Vector3();
+    const size = new THREE.Vector3();
     playerBox.getSize(size);
 
     // Lấy chiều dài, chiều rộng và chiều cao từ kích thước
-    var length = size.x;
-    var width = size.y;
-    var height = size.z;
+    const length = size.x;
+    const width = size.y;
+    const height = size.z;
 
-    let futurePlayerBox = new THREE.Box3().set(
+    let futurePlayerBox = new THREE.Box3().setFromCenterAndSize(
       new THREE.Vector3(this.posX + deltaX, this.posY, this.posZ + deltaZ), // Tọa độ góc dưới bên trái của hình hộp
-      new THREE.Vector3(this.posX + deltaX + length, this.posY + width, this.posZ + deltaZ + height) // Tọa độ góc trên bên phải của hình hộp
+      new THREE.Vector3(length - 0.5, width, height - 0.5) // Tọa độ góc trên bên phải của hình hộp
     );
 
-
-    var futurePlayerBoxHelper = new THREE.Box3Helper(futurePlayerBox, 0xff0000); // Màu đỏ
-
-    // Thêm hộp dây vào scene
-    // this.scene.add(futurePlayerBoxHelper);
-
-    var isCollisions = false;
+    let isCollisions = false;
     for (let i = 0; i < trees.length; i++) {
       let tree = trees[i];
 

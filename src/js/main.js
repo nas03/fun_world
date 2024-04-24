@@ -1,10 +1,13 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"; // Add '.js' extension
 import { loadAllModels } from "./utilities/loadModelFromDish.js";
 import { Player } from "./entities/player.js";
 import { generateLanes, animateVehicle } from "./utilities/generateMap.js";
 import { playMusic } from "./utilities/playSound.js";
+import axios from 'axios';
+import toastr, { error } from 'toastr';
+import { Entity } from "./entities/entity.js";
 
+const baseUrl = "https://funroad-server.onrender.com/api/user"
 const rankButton = document.getElementById("see-rank");
 const retryButton = document.querySelector(".end-game button");
 const closeButton = document.getElementById("btn-close");
@@ -12,6 +15,8 @@ const counterCurrent = document.getElementById("counter");
 const maxScore = document.getElementById("maxScore");
 const retry = document.querySelector(".end-game");
 const rankInformation = document.querySelector(".rank-container");
+const startButton = document.querySelector("#start");
+const gameTitle = document.querySelector("#gameTitle");
 
 let cars = [];
 let player;
@@ -36,18 +41,19 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const orbit = new OrbitControls(camera, renderer.domElement);
-
 //Light
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Màu trắng, intensity 1
-directionalLight.position.set(-6, 6, -6);
-directionalLight.castShadow = true;
-directionalLight.intensity = 5;
-directionalLight.shadow.camera.left = -15; // Điểm bắt đầu bên trái của phạm vi camera
-directionalLight.shadow.camera.right = 15; // Điểm kết thúc bên phải của phạm vi camera
-directionalLight.shadow.camera.top = 15; // Điểm kết thúc phía trên của phạm vi camera
-directionalLight.shadow.camera.bottom = -15; // Điểm bắt đầu phía dưới của phạm vi camera
-scene.add(directionalLight);
+var shadowLight = new THREE.DirectionalLight(0xffffff, 1); // Màu trắng, intensity 1
+shadowLight.position.set(-50, 50, -50);
+shadowLight.castShadow = true;
+shadowLight.intensity = 5;
+shadowLight.shadow.camera.far = 100
+shadowLight.shadow.camera.left = -15; // Điểm bắt đầu bên trái của phạm vi camera
+shadowLight.shadow.camera.right = 15; // Điểm kết thúc bên phải của phạm vi camera
+shadowLight.shadow.camera.top = 15; // Điểm kết thúc phía trên của phạm vi camera
+shadowLight.shadow.camera.bottom = -15; // Điểm bắt đầu phía dưới của phạm vi camera
+scene.add(shadowLight);
+
+
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
@@ -158,6 +164,27 @@ const modelPaths = [
     ],
     type: ["police_car", "car"],
   },
+  {
+    path: [
+      "../assets/models/vehicles/train/back/0.obj",
+      "../assets/models/vehicles/train/back/0.png",
+    ],
+    type: ["back_train", "car"],
+  },
+  {
+    path: [
+      "../assets/models/vehicles/train/front/0.obj",
+      "../assets/models/vehicles/train/front/0.png",
+    ],
+    type: ["front_train", "car"],
+  },
+  {
+    path: [
+      "../assets/models/vehicles/train/middle/0.obj",
+      "../assets/models/vehicles/train/middle/0.png",
+    ],
+    type: ["middle_train", "car"],
+  }
 ];
 
 const models = await loadAllModels(modelPaths).catch((error) => {
@@ -172,44 +199,100 @@ function onResize() {
   renderer.setPixelRatio(window.devicePixelRatio);
 }
 
-const initGame = () => {
-  window.addEventListener("resize", onResize);
+async function getDataRank() {
+  try {
+    const response = await axios.get(baseUrl)
+    if (response.data.message === "OK") {
+      const rankContainer = document.querySelector(".rank-container");
+      const rankHeader = rankContainer.querySelector(".rank-header");
+      rankHeader.innerHTML = "";
 
-  if (!localStorage.getItem("maxScoreFunWorld")) {
+      const rankRow = document.createElement("div");
+      rankRow.classList.add("rank-header");
+      rankRow.innerHTML = `
+        <p>Rank</p>
+        <p>Score</p>
+      `;
+      rankHeader.appendChild(rankRow);
+
+      const users = response.data.data.sort((userA, userB) => userB.score - userA.score);
+      for (let i = 0; i < users.length; i++) {
+        const user = users[i];
+        const rankItem = document.createElement("div");
+        rankItem.classList.add("rank-item");
+        rankItem.innerHTML = `
+          <p>${i + 1}</p>
+          <p>${user.name}</p>
+          <p>${user.score}</p>
+        `;
+        rankContainer.appendChild(rankItem);
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const initGame = async () => {
+  window.addEventListener("resize", onResize);
+  if (!localStorage.getItem("maxScoreFunWorld") || localStorage.getItem("maxScoreFunWorld" == null)) {
     localStorage.setItem("maxScoreFunWorld", 0);
   }
 
+  getDataRank()
+
   maxScore.innerText = "Max: " + localStorage.getItem("maxScoreFunWorld");
 
-  const startButton = document.querySelector("#start");
-  const title = document.querySelector("#title");
-  startButton.addEventListener("click", () => {
-    startButton.remove();
-    title.remove();
-    playMusic();
-    player.play(models, scene);
-  });
+  const form = document.querySelector(".form");
+  if (localStorage.getItem("name")) {
+    form.style.display = "none";
+  } else {
+    startButton.style.display = "none";
+    const submit = document.querySelector(".submit");
+    submit.addEventListener("click", async () => {
+      const name = document.getElementById("name");
+      if (!name.value.trim || name.value == '') {
+        toastr.info("Please enter a name.");
+        return;
+      }
+      try {
+        const data = name.value
+        const response = await axios.post(baseUrl, {
+          name: data
+        });
+        console.log(response)
+        if (!response.data.account) {
+          console.error("Error creating user:", response.data.message);
+          return;
+        }
+
+        localStorage.setItem("name", response.data.account.name);
+        localStorage.setItem("userId", response.data.account._id)
+        localStorage.setItem("maxScoreFunWorld", response.data.account.score)
+        form.style.display = "none";
+        startButton.style.display = "block";
+      } catch (error) {
+        console.error("Error sending user name to API:", error);
+      }
+    })
+  }
 
   playGame();
 };
 
 initGame();
+addEvent();
 
 function playGame() {
   if (models === null || models === undefined) {
     console.error("models null at main");
   }
 
-  player = new Player("chicken", models, 0, 0, 0, scene);
-
+  player = new Player("chicken", models, 0, 0, 0);
   scene.add(player.model);
 
   cars = generateLanes(models, scene).cars;
-
-
 }
-
-orbit.update();
 
 const collisionThreshold = 1;
 
@@ -224,36 +307,30 @@ function checkCollisions() {
       return;
     }
   }
-
-
-  // for (let i = 0; i < trees.length; i++) {
-  //   const tree = trees[i];
-  //   const treePosition = tree.model.position;
-  //   const distanceToTree = player.model.position.distanceTo(treePosition);
-  //   // Nếu khoảng cách nhỏ hơn ngưỡng va chạm với cây, xem như có va chạm
-  //   if (distanceToTree < collisionThreshold) {
-  //     // Lưu lại vị trí hợp lệ trước đó của người chơi
-  //     player.lastValidPosition.copy(player.model.position);
-  //     // Thiết lập lại vị trí của người chơi để ngăn chúng đi qua cây
-  //     player.setPosition(player.lastValidPosition.x, player.lastValidPosition.y, player.lastValidPosition.z);
-  //     return;
-  //   }
-  // }
 }
 
-function endGame(event) {
-  retry.style.display = "block";
+function shadowCamFollowPlayer() {
+  let playerPos = player.model.position;
+  shadowLight.position.set(playerPos.x - 50, 50, playerPos.z - 50)
 
-  event.preventDefault();
-  document.addEventListener("keydown", function (event) {
-    event.preventDefault();
-  });
+  shadowLight.shadow.camera.left = playerPos.x - 15; // Điểm bắt đầu bên trái của phạm vi camera
+  shadowLight.shadow.camera.right = playerPos.x + 15; // Điểm kết thúc bên phải của phạm vi camera
+  shadowLight.shadow.camera.top = playerPos.z + 15; // Điểm kết thúc phía trên của phạm vi camera
+  shadowLight.shadow.camera.bottom = playerPos.z - 15; // Điểm bắt đầu phía dưới của phạm vi camera
+  // console.error(shadowLight.shadow.camera.left + " " + shadowLight.shadow.camera.right + " " +
+  //   shadowLight.shadow.camera.top + " " + shadowLight.shadow.camera.down);
+}
+
+function endGame() {
+  retry.style.display = "block";
+  player.isDead = true;
 }
 
 function animate() {
   requestAnimationFrame(animate);
   checkCollisions();
-
+  shadowCamFollowPlayer();
+  // controls.update()
   if (models) {
     animateVehicle(models);
   }
@@ -270,19 +347,49 @@ function animate() {
 
 animate();
 
-retryButton.addEventListener("click", function () {
-  var endGameDiv = document.querySelector(".end-game");
-  endGameDiv.style.display = "none";
-  player.setPosition(0, 0, 0);
-  camera.position.set(4, 12, -5);
-  player.counter = 0;
-  counterCurrent.innerText = player.counter;
-});
+function addEvent() {
+  retryButton.addEventListener("click", async function () {
+    try {
+      console.log(player.ScoreNow)
+      if (player.ScoreNow > localStorage.getItem("maxScoreFunWorld")) {
+        localStorage.setItem("maxScoreFunWorld", player.ScoreNow);
+        const data = {
+          _id: localStorage.getItem("userId"),
+          score: localStorage.getItem("maxScoreFunWorld")
+        }
+        const response = await axios.put(baseUrl, data)
+        getDataRank()
+      }
+    } catch (error) {
+      console.error("Error sending user name to API:", error);
+    }
 
-rankButton.addEventListener("click", function () {
-  rankInformation.style.display = "block";
-});
+    const endGameDiv = document.querySelector(".end-game");
+    endGameDiv.style.display = "none";
+    player.setPosition(0, 0, 0);
+    camera.position.set(4, 12, -5);
+    player.counter = 0;
+    player.isDead = false;
+    counterCurrent.innerText = player.counter;
+  });
 
-closeButton.addEventListener("click", function () {
-  rankInformation.style.display = "none";
-});
+  rankButton.addEventListener("click", function () {
+    rankInformation.style.display = "block";
+    startButton.style.display = "none";
+    gameTitle.style.display = "none";
+  });
+
+  closeButton.addEventListener("click", function () {
+    rankInformation.style.display = "none";
+    startButton.style.display = "block";
+    gameTitle.style.display = "block";
+  });
+
+  startButton.addEventListener("click", () => {
+    startButton.style.display = "none";
+    gameTitle.style.display = "none";
+    playMusic();
+    player.play(models, scene);
+  });
+}
+
