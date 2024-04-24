@@ -66,8 +66,8 @@ export class Player extends Entity {
               this.jump(deltaX, deltaZ);
               this.targetZ = this.posZ + deltaZ;
               // thêm lane
-              const laneType =
-                generateRandomPosition(0, 2) === 0 ? "field" : "road";
+              let randomNumber = generateRandomPosition(1, 10)
+              const laneType = randomNumber >= 1 && randomNumber <= 4 ? 'field' : randomNumber >= 5 && randomNumber <= 8 ? 'road' : 'railroad';
               const direction = Math.random() < 0.5 ? "left" : "right";
 
               new Lane(laneType, direction, this.targetZ + 13, models, scene)
