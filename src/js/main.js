@@ -359,6 +359,8 @@ function addEvent() {
           score: localStorage.getItem("maxScoreFunWorld")
         }
         const response = await axios.put(baseUrl, data)
+        player.counter = 0;
+        player.ScoreNow = 0;
         getDataRank()
       }
     } catch (error) {
@@ -371,7 +373,7 @@ function addEvent() {
     camera.position.set(4, 12, -5);
     player.counter = 0;
     player.isDead = false;
-    counterCurrent.innerText = player.counter;
+    counterCurrent.innerText = 0;
   });
 
   rankButton.addEventListener("click", function () {
