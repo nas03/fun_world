@@ -204,6 +204,8 @@ async function getDataRank() {
     const response = await axios.get(baseUrl)
     if (response.data.message === "OK") {
       const rankContainer = document.querySelector(".rank-container");
+      const existingRankItems = rankContainer.querySelectorAll(".rank-item");
+      existingRankItems.forEach((item) => item.remove());
       const rankHeader = rankContainer.querySelector(".rank-header");
       rankHeader.innerHTML = "";
 
@@ -211,7 +213,6 @@ async function getDataRank() {
       rankRow.classList.add("rank-header");
       rankRow.innerHTML = `
         <p>Rank</p>
-        <p>Score</p>
       `;
       rankHeader.appendChild(rankRow);
 
@@ -315,7 +316,6 @@ function checkCollisions() {
 
 function shadowCamFollowPlayer() {
   let playerPos = player.model.position;
-
   shadowLight.position.set(playerPos.x - 50, 50, playerPos.z - 50)
   shadowLight.target = player.model;
   shadowLight.shadow.camera.left = playerPos.x - 8; // Điểm bắt đầu bên trái của phạm vi camera
@@ -363,6 +363,8 @@ function addEvent() {
           score: localStorage.getItem("maxScoreFunWorld")
         }
         const response = await axios.put(baseUrl, data)
+        player.counter = 0;
+        player.ScoreNow = 0;
         getDataRank()
       }
     } catch (error) {
@@ -375,7 +377,7 @@ function addEvent() {
     camera.position.set(4, 12, -5);
     player.counter = 0;
     player.isDead = false;
-    counterCurrent.innerText = player.counter;
+    counterCurrent.innerText = 0;
   });
 
   rankButton.addEventListener("click", function () {
