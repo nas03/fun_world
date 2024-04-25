@@ -291,8 +291,7 @@ function playGame() {
   player = new Player("chicken", models, 0, 0, 0);
   scene.add(player.model);
 
-  let frontTrain = new Player("front_train", models, 5, 0, 0);
-  scene.add(frontTrain.model);
+
 
   cars = generateLanes(models, scene).cars;
 }
