@@ -204,6 +204,8 @@ async function getDataRank() {
     const response = await axios.get(baseUrl)
     if (response.data.message === "OK") {
       const rankContainer = document.querySelector(".rank-container");
+      const existingRankItems = rankContainer.querySelectorAll(".rank-item");
+      existingRankItems.forEach((item) => item.remove());
       const rankHeader = rankContainer.querySelector(".rank-header");
       rankHeader.innerHTML = "";
 
@@ -211,7 +213,6 @@ async function getDataRank() {
       rankRow.classList.add("rank-header");
       rankRow.innerHTML = `
         <p>Rank</p>
-        <p>Score</p>
       `;
       rankHeader.appendChild(rankRow);
 
@@ -311,7 +312,7 @@ function checkCollisions() {
 
 function shadowCamFollowPlayer() {
   let playerPos = player.model.position;
-
+  shadowLight.position.set(playerPos.x - 50, 50, playerPos.z - 50)
   shadowLight.target = player.model;
   shadowLight.shadow.camera.left = playerPos.x - 8; // Điểm bắt đầu bên trái của phạm vi camera
   shadowLight.shadow.camera.right = playerPos.x + 8; // Điểm kết thúc bên phải của phạm vi camera
