@@ -311,12 +311,12 @@ function checkCollisions() {
 
 function shadowCamFollowPlayer() {
   let playerPos = player.model.position;
-  shadowLight.position.set(playerPos.x - 50, 50, playerPos.z - 50)
 
-  shadowLight.shadow.camera.left = playerPos.x - 15; // Điểm bắt đầu bên trái của phạm vi camera
-  shadowLight.shadow.camera.right = playerPos.x + 15; // Điểm kết thúc bên phải của phạm vi camera
-  shadowLight.shadow.camera.top = playerPos.z + 15; // Điểm kết thúc phía trên của phạm vi camera
-  shadowLight.shadow.camera.bottom = playerPos.z - 15; // Điểm bắt đầu phía dưới của phạm vi camera
+  shadowLight.target = player.model;
+  shadowLight.shadow.camera.left = playerPos.x - 8; // Điểm bắt đầu bên trái của phạm vi camera
+  shadowLight.shadow.camera.right = playerPos.x + 8; // Điểm kết thúc bên phải của phạm vi camera
+  shadowLight.shadow.camera.top = playerPos.z + 8; // Điểm kết thúc phía trên của phạm vi camera
+  shadowLight.shadow.camera.bottom = playerPos.z - 8; // Điểm bắt đầu phía dưới của phạm vi camera
   // console.error(shadowLight.shadow.camera.left + " " + shadowLight.shadow.camera.right + " " +
   //   shadowLight.shadow.camera.top + " " + shadowLight.shadow.camera.down);
 }
