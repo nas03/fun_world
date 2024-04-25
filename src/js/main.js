@@ -378,7 +378,7 @@ function addEvent() {
     player.counter = 0;
     player.ScoreNow = 0;
     player.isDead = false;
-    counterCurrent.innerText =  player.counter;
+    counterCurrent.innerText =  player.counter; 
   });
 
   rankButton.addEventListener("click", function () {
