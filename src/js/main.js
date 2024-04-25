@@ -291,17 +291,22 @@ function playGame() {
   player = new Player("chicken", models, 0, 0, 0);
   scene.add(player.model);
 
+  let frontTrain = new Player("front_train", models, 5, 0, 0);
+  scene.add(frontTrain.model);
+
   cars = generateLanes(models, scene).cars;
 }
 
 const collisionThreshold = 1;
 
 function checkCollisions() {
+  const playerBox = new THREE.Box3().setFromObject(player.model);
+
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
-    const carPosition = car.model.position;
-    const distance = player.model.position.distanceTo(carPosition);
-    if (distance < collisionThreshold) {
+    const carBox = new THREE.Box3().setFromObject(car.model);
+
+    if (playerBox.intersectsBox(carBox)) {
       endGame();
 
       return;
