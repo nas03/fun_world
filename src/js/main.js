@@ -372,8 +372,9 @@ function addEvent() {
     player.setPosition(0, 0, 0);
     camera.position.set(4, 12, -5);
     player.counter = 0;
+    player.ScoreNow = 0;
     player.isDead = false;
-    counterCurrent.innerText = 0;
+    counterCurrent.innerText =  player.counter;
   });
 
   rankButton.addEventListener("click", function () {
