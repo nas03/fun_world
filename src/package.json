@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@rollup/rollup-darwin-arm64": "^4.17.2",
     "axios": "^1.6.8",
     "react-toastify": "^10.0.5",
     "three": "^0.163.0",
