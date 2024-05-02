@@ -3,7 +3,8 @@
     "axios": "^1.6.8",
     "react-toastify": "^10.0.5",
     "three": "^0.163.0",
-    "toastr": "^2.1.4"
+    "toastr": "^2.1.4",
+    "@rollup/rollup-linux-x64-gnu": "latest"
 
   },
   "devDependencies": {
