@@ -68,120 +68,120 @@ const modelPaths = [
   },
   {
     path: [
-      "../assets/models/characters/bacon/bacon.obj",
-      "../assets/models/characters/bacon/bacon.png",
+      "./assets/models/characters/bacon/bacon.obj",
+      "./assets/models/characters/bacon/bacon.png",
     ],
     type: ["bacon", "player"],
   },
   {
     path: [
-      "../assets/models/environment/grass/model.obj",
-      "../assets/models/environment/grass/light-grass.png",
+      "./assets/models/environment/grass/model.obj",
+      "./assets/models/environment/grass/light-grass.png",
     ],
     type: ["grass", "land"],
   },
   {
     path: [
-      "../assets/models/environment/tree/0/0.obj",
-      "../assets/models/environment/tree/0/0.png",
+      "./assets/models/environment/tree/0/0.obj",
+      "./assets/models/environment/tree/0/0.png",
     ],
     type: ["tree0", "tree"],
   },
   {
     path: [
-      "../assets/models/environment/tree/1/0.obj",
-      "../assets/models/environment/tree/1/0.png",
+      "./assets/models/environment/tree/1/0.obj",
+      "./assets/models/environment/tree/1/0.png",
     ],
     type: ["tree1", "tree"],
   },
   {
     path: [
-      "../assets/models/environment/tree/2/0.obj",
-      "../assets/models/environment/tree/2/0.png",
+      "./assets/models/environment/tree/2/0.obj",
+      "./assets/models/environment/tree/2/0.png",
     ],
     type: ["tree2", "tree"],
   },
   {
     path: [
-      "../assets/models/environment/tree/3/0.obj",
-      "../assets/models/environment/tree/3/0.png",
+      "./assets/models/environment/tree/3/0.obj",
+      "./assets/models/environment/tree/3/0.png",
     ],
     type: ["tree3", "tree"],
   },
   {
     path: [
-      "../assets/models/environment/road/model.obj",
-      "../assets/models/environment/road/blank-texture.png",
+      "./assets/models/environment/road/model.obj",
+      "./assets/models/environment/road/blank-texture.png",
     ],
     type: ["blank_road", "road"],
   },
   {
     path: [
-      "../assets/models/environment/road/model.obj",
-      "../assets/models/environment/road/stripes-texture.png",
+      "./assets/models/environment/road/model.obj",
+      "./assets/models/environment/road/stripes-texture.png",
     ],
     type: ["stripe_road", "road"],
   },
   {
     path: [
-      "../assets/models/environment/railroad/0.obj",
-      "../assets/models/environment/railroad/0.png",
+      "./assets/models/environment/railroad/0.obj",
+      "./assets/models/environment/railroad/0.png",
     ],
     type: ["railroad", "road"],
   },
   {
     path: [
-      "../assets/models/vehicles/orange_car/0.obj",
-      "../assets/models/vehicles/orange_car/0.png",
+      "./assets/models/vehicles/orange_car/0.obj",
+      "./assets/models/vehicles/orange_car/0.png",
     ],
     type: ["orange_car", "car"],
   },
   {
     path: [
-      "../assets/models/vehicles/blue_truck/0.obj",
-      "../assets/models/vehicles/blue_truck/0.png",
+      "./assets/models/vehicles/blue_truck/0.obj",
+      "./assets/models/vehicles/blue_truck/0.png",
     ],
     type: ["blue_truck", "car"],
   },
   {
     path: [
-      "../assets/models/vehicles/blue_car/0.obj",
-      "../assets/models/vehicles/blue_car/0.png",
+      "./assets/models/vehicles/blue_car/0.obj",
+      "./assets/models/vehicles/blue_car/0.png",
     ],
     type: ["blue_car", "car"],
   },
   {
     path: [
-      "../assets/models/vehicles/green_car/0.obj",
-      "../assets/models/vehicles/green_car/0.png",
+      "./assets/models/vehicles/green_car/0.obj",
+      "./assets/models/vehicles/green_car/0.png",
     ],
     type: ["green_car", "car"],
   },
   {
     path: [
-      "../assets/models/vehicles/police_car/0.obj",
-      "../assets/models/vehicles/police_car/0.png",
+      "./assets/models/vehicles/police_car/0.obj",
+      "./assets/models/vehicles/police_car/0.png",
     ],
     type: ["police_car", "car"],
   },
   {
     path: [
-      "../assets/models/vehicles/train/back/0.obj",
-      "../assets/models/vehicles/train/back/0.png",
+      "./assets/models/vehicles/train/back/0.obj",
+      "./assets/models/vehicles/train/back/0.png",
     ],
     type: ["back_train", "car"],
   },
   {
     path: [
-      "../assets/models/vehicles/train/front/0.obj",
-      "../assets/models/vehicles/train/front/0.png",
+      "./assets/models/vehicles/train/front/0.obj",
+      "./assets/models/vehicles/train/front/0.png",
     ],
     type: ["front_train", "car"],
   },
   {
     path: [
-      "../assets/models/vehicles/train/middle/0.obj",
-      "../assets/models/vehicles/train/middle/0.png",
+      "./assets/models/vehicles/train/middle/0.obj",
+      "./assets/models/vehicles/train/middle/0.png",
     ],
     type: ["middle_train", "car"],
   }
