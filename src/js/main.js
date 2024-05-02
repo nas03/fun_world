@@ -61,8 +61,8 @@ scene.add(ambientLight);
 const modelPaths = [
   {
     path: [
-      "../assets/models/characters/chicken/0.obj",
-      "../assets/models/characters/chicken/0.png",
+      "./assets/models/characters/chicken/0.obj",
+      "./assets/models/characters/chicken/0.png",
     ],
     type: ["chicken", "player"],
   },
