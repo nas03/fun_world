@@ -185,7 +185,7 @@ const modelPaths = [
 	},
 ];
 
-const models = await loadAllModels(modelPaths).catch((error) => {
+const models =  await loadAllModels(modelPaths).catch((error) => {
 	console.error('Lỗi khi load model main:', error);
 });
 
