@@ -1,50 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Fun Road</title>
+		<style>
+			body {
+				margin: 0;
+			}
+		</style>
+		<link rel="stylesheet" href="style.css" />
+	</head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fun Road</title>
-  <style>
-    body {
-      margin: 0;
-    }
-  </style>
-  <link rel="stylesheet" href="style.css" />
-</head>
+	<body>
+		<div id="maxScore">Max: 0</div>
+		<div id="counter">0</div>
+		<div id="gameTitle">Fun Road</div>
+		<button id="start">Start game</button>
 
-<body>
-  <div id="maxScore">Max: 0</div>
-  <div id="counter">0</div>
-  <div id="gameTitle">Fun Road</div>
-  <button id="start">Start game</button>
+		<div class="form">
+			<div class="input-container">
+				<input
+					id="name"
+					name="name"
+					class="input"
+					type="text"
+					placeholder=" " />
+				<div class="cut"></div>
+				<label for="name" class="placeholder">Name</label>
+			</div>
+			<button class="submit">submit</button>
+		</div>
 
-  <div class="form">
-    <div class="input-container">
-      <input id="name" name="name" class="input" type="text" placeholder=" " />
-      <div class="cut"></div>
-      <label for="name" class="placeholder">Name</label>
-    </div>
-    <button class="submit">submit</button>
-  </div>
+		<button id="see-rank">Rank</button>
+		<div class="end-game">
+			<button>Retry</button>
+		</div>
 
-  <button id="see-rank">Rank</button>
-  <div class="end-game">
-    <button>Retry</button>
-  </div>
+		<div class="rank-container">
+			<h6>LEADERBOARD</h6>
+			<button id="btn-close">Close</button>
+			<div class="rank-header">
+				<p>Rank</p>
+				<p>Name</p>
+				<p>Score</p>
+			</div>
+		</div>
+		<script type="module">
+			// Find the latest version by visiting https://unpkg.com/three. The URL will
+			// redirect to the newest stable release.
+			import * as THREE from 'https://unpkg.com/three/build/three.module.js';
 
-  <div class="rank-container">
-    <h6>LEADERBOARD</h6>
-    <button id="btn-close">Close</button>
-    <div class="rank-header">
-      <p>Rank</p>
-      <p>Name</p>
-      <p>Score</p>
-    </div>
-  </div>
-
-  <script type="module" src="./js/entities/player.js"></script>
-  <script type="module" src="./js/main.js"></script>
-</body>
-
+			const scene = new THREE.Scene();
+		</script>
+		<script type="module" src="./js/entities/player.js"></script>
+		<script type="module" src="./js/main.js"></script>
+	</body>
 </html>
