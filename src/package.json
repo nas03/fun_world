@@ -3,11 +3,11 @@
     "axios": "^1.6.8",
     "react-toastify": "^10.0.5",
     "three": "^0.163.0",
-    "toastr": "^2.1.4",
-    "@rollup/rollup-darwin-arm64": "latest",
-    "@rollup/rollup-darwin-x64": "latest",
-    "@rollup/rollup-linux-x64-gnu": "latest",
-    "@rollup/rollup-win32-x64-gnu": "latest"
+    "toastr": "^2.1.4"
+    // "@rollup/rollup-darwin-arm64": "latest",
+    // "@rollup/rollup-darwin-x64": "latest",
+    // "@rollup/rollup-linux-x64-gnu": "latest",
+    // "@rollup/rollup-win32-x64-gnu": "latest"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
