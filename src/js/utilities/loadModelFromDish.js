@@ -53,7 +53,7 @@ export async function loadAllModels(modelPaths) {
     try {
         const models = [];
         for (const modelPath of modelPaths) {
-            const model = await loadModel(modelPath.path[0]);
+            const model = await loadModel(modelPath);
 
             const boundingBox = new THREE.Box3().setFromObject(model);
             const size = new THREE.Vector3();
